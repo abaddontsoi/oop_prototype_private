@@ -41,6 +41,22 @@ public class BankDatabase
          return false; // account number not found, so return false
    } // end method authenticateUser
 
+   // to check whether the account is exists in the database
+   public boolean accountExists(int ACnumber){
+
+      int acFound = 0;
+
+      // loop through accounts searching for matching account number
+      for ( Account currentAccount : accounts )
+      {
+         if(currentAccount.getAccountNumber() == ACnumber)
+            acFound += 1;
+      } // end for
+
+      // return true when only one account is matched with ACnumber
+      return acFound==1;
+
+   }
    // return available balance of Account with specified account number
    public double getAvailableBalance( int userAccountNumber )
    {
