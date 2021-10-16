@@ -1,0 +1,63 @@
+diff --git a/ATMsource/Withdrawal.java b/ATMsource/Withdrawal.java
+index 6e0af62..81e6d33 100644
+--- a/ATMsource/Withdrawal.java
++++ b/ATMsource/Withdrawal.java
+@@ -7,8 +7,11 @@ public class Withdrawal extends Transaction
+    private Keypad keypad; // reference to keypad
+    private CashDispenser cashDispenser; // reference to cash dispenser
+ 
++   // constant corresponding to menu option to customize amount
++   private final static int CUSTOMIZE = 6;
++
+    // constant corresponding to menu option to cancel
+-   private final static int CANCELED = 6;
++   private final static int CANCELED = 7;
+ 
+    // Withdrawal constructor
+    public Withdrawal( int userAccountNumber, Screen atmScreen, 
+@@ -92,19 +95,20 @@ public class Withdrawal extends Transaction
+       Screen screen = getScreen(); // get screen reference
+       
+       // array of amounts to correspond to menu numbers
+-      int amounts[] = { 0, 20, 40, 60, 100, 200 };
++      int amounts[] = { 0, 200, 400, 600, 800, 1000};
+ 
+       // loop while no valid choice has been made
+       while ( userChoice == 0 )
+       {
+          // display the menu
+          screen.displayMessageLine( "\nWithdrawal Menu:" );
+-         screen.displayMessageLine( "1 - $20" );
+-         screen.displayMessageLine( "2 - $40" );
+-         screen.displayMessageLine( "3 - $60" );
+-         screen.displayMessageLine( "4 - $100" );
+-         screen.displayMessageLine( "5 - $200" );
+-         screen.displayMessageLine( "6 - Cancel transaction" );
++         screen.displayMessageLine( "1 - $200" );
++         screen.displayMessageLine( "2 - $400" );
++         screen.displayMessageLine( "3 - $600" );
++         screen.displayMessageLine( "4 - $800" );
++         screen.displayMessageLine( "5 - $1000" );
++         screen.displayMessageLine( "6 - Custom amount" );
++         screen.displayMessageLine( "7 - Cancel transaction" );
+          screen.displayMessage( "\nChoose a withdrawal amount: " );
+ 
+          int input = keypad.getInput(); // get user input through keypad
+@@ -118,7 +122,13 @@ public class Withdrawal extends Transaction
+             case 4:
+             case 5:
+                userChoice = amounts[ input ]; // save user's choice
+-               break;       
++               break;
++
++            case CUSTOMIZE: // get user input
++               screen.displayMessageLine("Please enter withdrawl amount: ");
++               userChoice = keypad.getInput();
++               break;
++               
+             case CANCELED: // the user chose to cancel
+                userChoice = CANCELED; // save user's choice
+                break;
+diff --git a/ATMsource/cp/Withdrawal.class b/ATMsource/cp/Withdrawal.class
+index 4c92275..1d5d203 100644
+Binary files a/ATMsource/cp/Withdrawal.class and b/ATMsource/cp/Withdrawal.class differ
