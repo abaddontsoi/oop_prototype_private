@@ -125,8 +125,11 @@ public class Withdrawal extends Transaction
                break;
 
             case CUSTOMIZE: // get user input
-               screen.displayMessageLine("Please enter withdrawl amount: ");
-               userChoice = keypad.getInput();
+               screen.displayMessageLine("Please enter withdrawl option: ");
+               int temp = keypad.getInput();
+               if (checkIsMultiple(temp, screen)) {
+                  userChoice = temp;
+               }
                break;
                
             case CANCELED: // the user chose to cancel
@@ -140,6 +143,17 @@ public class Withdrawal extends Transaction
 
       return userChoice; // return withdrawal amount or CANCELED
    } // end method displayMenuOfAmounts
+
+   // to check whether user's input is a multiple of 100
+   public boolean checkIsMultiple(int input, Screen screen){
+      int mod = input % 100;
+      if (mod == 0) {
+         return true;
+      }else{
+         screen.displayMessageLine("Input is not a multiple of $100, aborting...");
+         return false;   
+      }
+   }
 } // end class Withdrawal
 
 

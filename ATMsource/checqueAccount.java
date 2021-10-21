@@ -1,8 +1,8 @@
-public class checqueAccount extends Account {
+public class ChecqueAccount extends Account {
 
     private double LimitPerCheque;
 
-    public checqueAccount(int theAccountNumber, int thePIN, 
+    public ChecqueAccount(int theAccountNumber, int thePIN, 
     double theAvailableBalance, double theTotalBalance) {
         
         super(theAccountNumber, thePIN, theAvailableBalance, theTotalBalance);
