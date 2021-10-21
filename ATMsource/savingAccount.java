@@ -1,8 +1,8 @@
-public class savingAccount extends Account{
+public class SavingAccount extends Account{
 
     protected double interestRate;
 
-    public savingAccount(int theAccountNumber, int thePIN, 
+    public SavingAccount(int theAccountNumber, int thePIN, 
     double theAvailableBalance, double theTotalBalance){
 
         super(theAccountNumber, thePIN, theAvailableBalance, theTotalBalance);

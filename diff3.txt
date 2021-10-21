@@ -1,0 +1,75 @@
+diff --git a/ATMsource/Withdrawal.java b/ATMsource/Withdrawal.java
+index 81e6d33..b85473d 100644
+--- a/ATMsource/Withdrawal.java
++++ b/ATMsource/Withdrawal.java
+@@ -125,8 +125,11 @@ public class Withdrawal extends Transaction
+                break;
+ 
+             case CUSTOMIZE: // get user input
+-               screen.displayMessageLine("Please enter withdrawl amount: ");
+-               userChoice = keypad.getInput();
++               screen.displayMessageLine("Please enter withdrawl option: ");
++               int temp = keypad.getInput();
++               if (checkIsMultiple(temp, screen)) {
++                  userChoice = temp;
++               }
+                break;
+                
+             case CANCELED: // the user chose to cancel
+@@ -140,6 +143,17 @@ public class Withdrawal extends Transaction
+ 
+       return userChoice; // return withdrawal amount or CANCELED
+    } // end method displayMenuOfAmounts
++
++   // to check whether user's input is a multiple of 100
++   public boolean checkIsMultiple(int input, Screen screen){
++      int mod = input % 100;
++      if (mod == 0) {
++         return true;
++      }else{
++         screen.displayMessageLine("Input is not a multiple of $100, aborting...");
++         return false;   
++      }
++   }
+ } // end class Withdrawal
+ 
+ 
+diff --git a/ATMsource/checqueAccount.java b/ATMsource/checqueAccount.java
+index d4f8d13..3cdc8a9 100644
+--- a/ATMsource/checqueAccount.java
++++ b/ATMsource/checqueAccount.java
+@@ -1,8 +1,8 @@
+-public class checqueAccount extends Account {
++public class ChecqueAccount extends Account {
+ 
+     private double LimitPerCheque;
+ 
+-    public checqueAccount(int theAccountNumber, int thePIN, 
++    public ChecqueAccount(int theAccountNumber, int thePIN, 
+     double theAvailableBalance, double theTotalBalance) {
+         
+         super(theAccountNumber, thePIN, theAvailableBalance, theTotalBalance);
+diff --git a/ATMsource/cp/Withdrawal.class b/ATMsource/cp/Withdrawal.class
+index 1d5d203..39fb9eb 100644
+Binary files a/ATMsource/cp/Withdrawal.class and b/ATMsource/cp/Withdrawal.class differ
+diff --git a/ATMsource/cp/checqueAccount.class b/ATMsource/cp/checqueAccount.class
+index 8b5c8cd..37c81f0 100644
+Binary files a/ATMsource/cp/checqueAccount.class and b/ATMsource/cp/checqueAccount.class differ
+diff --git a/ATMsource/cp/savingAccount.class b/ATMsource/cp/savingAccount.class
+index e75d131..0c9122b 100644
+Binary files a/ATMsource/cp/savingAccount.class and b/ATMsource/cp/savingAccount.class differ
+diff --git a/ATMsource/savingAccount.java b/ATMsource/savingAccount.java
+index 2b3f2c9..5363fca 100644
+--- a/ATMsource/savingAccount.java
++++ b/ATMsource/savingAccount.java
+@@ -1,8 +1,8 @@
+-public class savingAccount extends Account{
++public class SavingAccount extends Account{
+ 
+     protected double interestRate;
+ 
+-    public savingAccount(int theAccountNumber, int thePIN, 
++    public SavingAccount(int theAccountNumber, int thePIN, 
+     double theAvailableBalance, double theTotalBalance){
+ 
+         super(theAccountNumber, thePIN, theAvailableBalance, theTotalBalance);
