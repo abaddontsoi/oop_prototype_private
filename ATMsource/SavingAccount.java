@@ -1,6 +1,6 @@
 public class SavingAccount extends Account{
 
-    protected double interestRate;
+    private double interestRate;
 
     public SavingAccount(int theAccountNumber, int thePIN, 
     double theAvailableBalance, double theTotalBalance){

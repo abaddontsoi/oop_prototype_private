@@ -1,0 +1,32 @@
+diff --git a/ATMsource/BankDatabase.java b/ATMsource/BankDatabase.java
+index d40deca..dab337b 100644
+--- a/ATMsource/BankDatabase.java
++++ b/ATMsource/BankDatabase.java
+@@ -8,9 +8,13 @@ public class BankDatabase
+    // no-argument BankDatabase constructor initializes accounts
+    public BankDatabase()
+    {
+-      accounts = new Account[ 2 ]; // just 2 accounts for testing
++      accounts = new Account[ 4 ]; // just 2 accounts for testing
+       accounts[ 0 ] = new Account( 12345, 54321, 1000.0, 1200.0 );
+-      accounts[ 1 ] = new Account( 98765, 56789, 200.0, 200.0 );  
++      accounts[ 1 ] = new Account( 98765, 56789, 200.0, 200.0 );
++
++      // new accounts of checque account and saving account
++      accounts[ 2 ] = new ChecqueAccount(23456, 65432, 500, 1000);
++      accounts[ 3 ] = new SavingAccount(34567, 76543, 2000, 2500); 
+    } // end no-argument BankDatabase constructor
+    
+    // retrieve Account object containing specified account number
+diff --git a/ATMsource/SavingAccount.java b/ATMsource/SavingAccount.java
+index 5363fca..a334429 100644
+--- a/ATMsource/SavingAccount.java
++++ b/ATMsource/SavingAccount.java
+@@ -1,6 +1,6 @@
+ public class SavingAccount extends Account{
+ 
+-    protected double interestRate;
++    private double interestRate;
+ 
+     public SavingAccount(int theAccountNumber, int thePIN, 
+     double theAvailableBalance, double theTotalBalance){
