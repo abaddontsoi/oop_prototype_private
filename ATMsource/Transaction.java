@@ -1,6 +1,8 @@
 // Transaction.java
 // Abstract superclass Transaction represents an ATM transaction
 
+//import java.lang.Math;
+
 public abstract class Transaction
 {
    private int accountNumber; // indicates account involved

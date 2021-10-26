@@ -3,60 +3,68 @@
 
 public class Account 
 {
-   private int accountNumber; // account number
-   private int pin; // PIN for authentication
-   private double availableBalance; // funds available for withdrawal
-   private double totalBalance; // funds available + pending deposits
+	private int accountNumber; // account number
+	private int pin; // PIN for authentication
+	private double availableBalance; // funds available for withdrawal
+	private double totalBalance; // funds available + pending deposits
 
-   // Account constructor initializes attributes
-   public Account( int theAccountNumber, int thePIN, 
-      double theAvailableBalance, double theTotalBalance )
-   {
-      accountNumber = theAccountNumber;
-      pin = thePIN;
-      availableBalance = theAvailableBalance;
-      totalBalance = theTotalBalance;
-   } // end Account constructor
+	// we assume existing accounts remain it original type, until the owner requests for changing
+	private static final String TYPE = "General account";
 
-   // determines whether a user-specified PIN matches PIN in Account
-   public boolean validatePIN( int userPIN )
-   {
-      if ( userPIN == pin )
-         return true;
-      else
-         return false;
-   } // end method validatePIN
-   
-   // returns available balance
-   public double getAvailableBalance()
-   {
-      return availableBalance;
-   } // end getAvailableBalance
+	// Account constructor initializes attributes
+	public Account( int theAccountNumber, int thePIN, 
+		double theAvailableBalance, double theTotalBalance )
+	{
+		accountNumber = theAccountNumber;
+		pin = thePIN;
+		availableBalance = theAvailableBalance;
+		totalBalance = theTotalBalance;
+	} // end Account constructor
 
-   // returns the total balance
-   public double getTotalBalance()
-   {
-      return totalBalance;
-   } // end method getTotalBalance
+	// determines whether a user-specified PIN matches PIN in Account
+	public boolean validatePIN( int userPIN )
+	{
+		if ( userPIN == pin )
+			return true;
+		else
+			return false;
+	} // end method validatePIN
+	
+	// returns available balance
+	public double getAvailableBalance()
+	{
+		return availableBalance;
+	} // end getAvailableBalance
 
-   // credits an amount to the account
-   public void credit( double amount )
-   {
-      totalBalance += amount; // add to total balance
-   } // end method credit
+	// returns the total balance
+	public double getTotalBalance()
+	{
+		return totalBalance;
+	} // end method getTotalBalance
 
-   // debits an amount from the account
-   public void debit( double amount )
-   {
-      availableBalance -= amount; // subtract from available balance
-      totalBalance -= amount; // subtract from total balance
-   } // end method debit
+	// credits an amount to the account
+	public void credit( double amount )
+	{
+		totalBalance += amount; // add to total balance
+	} // end method credit
 
-   // returns account number
-   public int getAccountNumber()
-   {
-      return accountNumber;  
-   } // end method getAccountNumber
+	// debits an amount from the account
+	public void debit( double amount )
+	{
+		availableBalance -= amount; // subtract from available balance
+		totalBalance -= amount; // subtract from total balance
+	} // end method debit
+
+	// returns account number
+	public int getAccountNumber()
+	{
+		return accountNumber;  
+	} // end method getAccountNumber
+
+	// returns account type
+	public String getType() {
+		return TYPE; 
+	}
 } // end class Account
 
 

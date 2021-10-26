@@ -1,19 +1,32 @@
-public class ChecqueAccount extends Account {
+
+public class ChequeAccount extends Account {
 
     private double LimitPerCheque;
+    
+    private static final String TYPE = "Cheque account";
 
-    public ChecqueAccount(int theAccountNumber, int thePIN, 
+
+    public ChequeAccount(int theAccountNumber, int thePIN, 
     double theAvailableBalance, double theTotalBalance) {
         
         super(theAccountNumber, thePIN, theAvailableBalance, theTotalBalance);
         LimitPerCheque = 10000;
     }
 
+    // allows user to set their cheque limit
     public void setLimit(double limit) {
         LimitPerCheque = limit;
     }
 
+    // returns current cheque limit
     public double getLimit(){
         return LimitPerCheque;
     }
+
+    // returns account type
+    @Override
+    public String getType() {
+        return TYPE;
+    }
+
 }
