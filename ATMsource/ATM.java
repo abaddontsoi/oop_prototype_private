@@ -88,7 +88,7 @@ public class ATM
                 "Invalid account number or PIN. Please try again." );
     } // end method authenticateUser
 
-    private boolean transactions(int mainMenuSelection, String ACtype) {
+    private boolean transactionsControl(int mainMenuSelection, String ACtype) {
 
         Transaction currentTransaction = null;
 
@@ -147,7 +147,7 @@ public class ATM
         while (!userExited) {
             int mainMenuSelection = displayMainMenu();
 
-            userExited = transactions(mainMenuSelection, type);
+            userExited = transactionControl(mainMenuSelection, type);
         }
     }
    
