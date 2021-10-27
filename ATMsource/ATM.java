@@ -147,7 +147,7 @@ public class ATM
         while (!userExited) {
             int mainMenuSelection = displayMainMenu();
 
-            userExited = transactionControl(mainMenuSelection, type);
+            userExited = transactionsControl(mainMenuSelection, type);
         }
     }
    
