@@ -112,6 +112,9 @@ public class ATM
                     if (currentTransaction != null) {
                         currentTransaction.execute(); // execute transaction when is not exit signal of general account    
                     }
+                    else {
+                        exitSignal = true;
+                    }
                     return exitSignal;
                     //break;
                 case EXIT: // user chose to terminate session
