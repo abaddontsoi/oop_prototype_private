@@ -48,22 +48,22 @@ public class Transfer extends Transaction {
         try {
             amount = keypad.getInput();
 
+            if (isSufficientTransfer(amount, availableBalance) && bankDatabase.accountExists(target) && target != currentAccountNumber) {
+                bankDatabase.debit(currentAccountNumber, amount);
+                bankDatabase.credit(target, amount);
+            }else{
+                screen.displayMessageLine("Availavle balance is lower than transfer amount or target account unavailable.");
+                screen.displayMessageLine("Progress aborted."); 
+            }
+
         } catch (Exception e) {
 
             // to maintain all inputs are integer, fund with cents are not considered
-            screen.displayMessageLine("Input mismatch! $0 will be transfered.");
+            screen.displayMessageLine("Input mismatch! No fund will be transfered.");
             amount = 0;
         }
 
-        if (isSufficientTransfer(amount, availableBalance) && bankDatabase.accountExists(target) && target != currentAccountNumber) {
-            
-            bankDatabase.debit(currentAccountNumber, amount);
-            bankDatabase.credit(target, amount);
-        }else{  
-
-            screen.displayMessageLine("Availavle balance is lower than transfer amount or target account unavailable.");
-            screen.displayMessageLine("Progress aborted."); 
-        }
+        
     } // end method execute
 
 }
