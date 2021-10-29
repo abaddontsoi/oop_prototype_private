@@ -21,35 +21,34 @@ public class Transfer extends Transaction {
 
         // initialize references to keypad
         keypad = atmKeypad;
+    }
+    //end Transfer constructor
+    public Transfer( Account userAccount, Screen atmScreen, 
+    BankDatabase atmBankDatabase, Keypad atmKeypad )
+    {
+        super( userAccount, atmScreen, atmBankDatabase );
 
-    }//end Transfer constructor
+        keypad = atmKeypad;
+    }
+ 
 
     public boolean isSufficientTransfer(double amount, double available){
         return amount<=available;
     }
 
- 
-    // perform transaction
-    public void execute()
-    {
-        // get references to bank database
-        bankDatabase = getBankDatabase();
-
-        int currentAccountNumber = getAccountNumber();
-        double availableBalance = bankDatabase.getAvailableBalance(currentAccountNumber); // amount available for transfer
- 
-        // get references to screen
-        screen = getScreen();
-
+    // transfer method for non-compounded account
+    private void transferNormal(double availableBalance, int accountNumber, Screen screen,Keypad keypad) {
+        //this.keypad = keypad; 
+        
         screen.displayMessage("Please enter target bank account number: ");
         target = keypad.getInput();
 
         screen.displayMessage("Please enter amount: ");
         try {
-            amount = keypad.getInput();
+            amount = keypad.getDoubleInput();
 
-            if (isSufficientTransfer(amount, availableBalance) && bankDatabase.accountExists(target) && target != currentAccountNumber) {
-                bankDatabase.debit(currentAccountNumber, amount);
+            if (isSufficientTransfer(amount, availableBalance) && bankDatabase.accountExists(target) && target != accountNumber) {
+                bankDatabase.debit(accountNumber, amount);
                 bankDatabase.credit(target, amount);
             }else{
                 screen.displayMessageLine("Availavle balance is lower than transfer amount or target account unavailable.");
@@ -59,8 +58,61 @@ public class Transfer extends Transaction {
         } catch (Exception e) {
 
             // to maintain all inputs are integer, fund with cents are not considered
-            screen.displayMessageLine("Input mismatch! No fund will be transfered.");
+            screen.displayMessageLine("Input mismatch! In normal mode.");
             amount = 0;
+        }
+    }
+ 
+    private void transferCompound(double availableBalance, Account subAccount, Screen screen, Keypad keypad){
+        int acNum = subAccount.getAccountNumber();
+
+        // this.keypad = keypad; 
+        screen.displayMessage("Please enter target bank account number: ");
+        target = keypad.getInput();
+
+        screen.displayMessage("Please enter amount: ");
+        try {
+            amount = keypad.getDoubleInput();
+
+            if (isSufficientTransfer(amount, availableBalance) && bankDatabase.accountExists(target) 
+                && target != acNum) {
+
+                bankDatabase.debit(subAccount, amount);
+                bankDatabase.credit(target, amount);
+            }else{
+                screen.displayMessageLine("Availavle balance is lower than transfer amount or target account unavailable.");
+                screen.displayMessageLine("Progress aborted."); 
+            }
+
+        } catch (Exception e) {
+
+            screen.displayMessageLine("Input mismatch! In compoud mode.");
+            amount = 0;
+        }
+
+    }
+    // perform transaction
+    public void execute()
+    {
+        // get references to bank database
+        bankDatabase = getBankDatabase();
+
+        boolean flag = super.getFlag();
+        Account subAccount = super.getAccount();
+
+        int currentAccountNumber = getAccountNumber();
+        double availableBalance = (subAccount != null)? bankDatabase.getAvailableBalance( getAccount()):
+            bankDatabase.getAvailableBalance( getAccountNumber() );
+ 
+        // get references to screen
+        screen = getScreen();
+
+        //transferCompound(availableBalance, subAccount, screen, keypad);
+
+        if(flag){
+            transferCompound(availableBalance, subAccount, screen, keypad);
+        }else{
+            transferNormal(availableBalance, currentAccountNumber, screen, keypad);
         }
 
         

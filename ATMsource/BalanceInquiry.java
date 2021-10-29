@@ -10,21 +10,40 @@ public class BalanceInquiry extends Transaction
       super( userAccountNumber, atmScreen, atmBankDatabase );
    } // end BalanceInquiry constructor
 
+   public BalanceInquiry( Account userAccount, Screen atmScreen, 
+      BankDatabase atmBankDatabase )
+   {
+      super( userAccount, atmScreen, atmBankDatabase );
+   }
+
    // performs the transaction
    public void execute()
    {
       // get references to bank database and screen
       BankDatabase bankDatabase = getBankDatabase();
       Screen screen = getScreen();
+      double availableBalance,totalBalance;
+      //double totalBalance;
 
-      // get the available balance for the account involved
-      double availableBalance = 
-         bankDatabase.getAvailableBalance( getAccountNumber() );
+      // if it is not a compound bank account, use account number on transaction 
+      if (super.getAccount() != null) {
+         // get the available balance for the account involved
+         availableBalance = 
+            bankDatabase.getAvailableBalance( getAccount() );
 
-      // get the total balance for the account involved
-      double totalBalance = 
-         bankDatabase.getTotalBalance( getAccountNumber() );
-      
+         // get the total balance for the account involved
+         totalBalance = 
+            bankDatabase.getTotalBalance( getAccount() );
+         
+      }else{
+         // get the available balance for the account involved
+         availableBalance = 
+            bankDatabase.getAvailableBalance( getAccountNumber() );
+
+         // get the total balance for the account involved
+         totalBalance = 
+            bankDatabase.getTotalBalance( getAccountNumber() );
+      }
       // display the balance information on the screen
       screen.displayMessageLine( "\nBalance Information:" );
       screen.displayMessage( " - Available balance: " ); 

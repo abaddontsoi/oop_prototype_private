@@ -8,6 +8,7 @@ public abstract class Transaction
    private int accountNumber; // indicates account involved
    private Screen screen; // ATM's screen
    private BankDatabase bankDatabase; // account info database
+   private Account account = null;
 
    // Transaction constructor invoked by subclasses using super()
    public Transaction( int userAccountNumber, Screen atmScreen, 
@@ -18,11 +19,26 @@ public abstract class Transaction
       bankDatabase = atmBankDatabase;
    } // end Transaction constructor
 
+   // Transaction constructor invoked by subclasses using super()
+   public Transaction( Account userAccount, Screen atmScreen, 
+      BankDatabase atmBankDatabase )
+   {
+      account = userAccount;
+      screen = atmScreen;
+      bankDatabase = atmBankDatabase;
+   } // end Transaction constructor
+
+
    // return account number 
    public int getAccountNumber()
    {
       return accountNumber; 
    } // end method getAccountNumber
+
+   // return account  
+   public Account getAccount(){
+      return account;
+   }// end method getAccount
 
    // return reference to screen
    public Screen getScreen()
@@ -35,6 +51,11 @@ public abstract class Transaction
    {
       return bankDatabase;
    } // end method getBankDatabase
+
+   // if it is not a compound account, return false
+   public boolean getFlag() {
+      return account != null;
+   }
 
    // perform the transaction (overridden by each subclass)
    abstract public void execute();

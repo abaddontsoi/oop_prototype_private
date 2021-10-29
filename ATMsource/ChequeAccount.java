@@ -13,7 +13,7 @@ public class ChequeAccount extends Account {
         LimitPerCheque = 10000;
     }
 
-    // allows user to set their cheque limit
+    // get method of this class
     public void setLimit(double limit) {
         LimitPerCheque = limit;
     }

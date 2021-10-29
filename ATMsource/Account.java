@@ -8,8 +8,12 @@ public class Account
 	private double availableBalance; // funds available for withdrawal
 	private double totalBalance; // funds available + pending deposits
 
+	// these attributes are only for accounts having saving and chequeing purpose
+	private SavingAccount saving = null;
+	private ChequeAccount chequing = null;
+
 	// we assume existing accounts remain it original type, until the owner requests for changing
-	private static final String TYPE = "General account";
+	private static String TYPE = "General account";
 
 	// Account constructor initializes attributes
 	public Account( int theAccountNumber, int thePIN, 
@@ -20,6 +24,41 @@ public class Account
 		availableBalance = theAvailableBalance;
 		totalBalance = theTotalBalance;
 	} // end Account constructor
+
+	// constructor initializes attributes for both saving and chequeing purpose 
+	public Account(int theAccountNumber, int thePIN, 
+	double savingAvailableBalance, double savingTotalBalance, double chequingAvailableBalance, double chequingTotalBalance)
+	{
+		accountNumber = theAccountNumber;
+		pin = thePIN;
+
+		saving = new SavingAccount(theAccountNumber, thePIN, savingAvailableBalance, savingTotalBalance);
+		chequing = new ChequeAccount(theAccountNumber, thePIN, chequingAvailableBalance, chequingTotalBalance);
+
+		TYPE = "Both";
+	}
+
+	public void _passBalance() {
+		if(_isSwapable()){
+			saving.credit(totalBalance);
+			totalBalance = 0;
+		}
+	}
+
+	// return true when the user owns both saving and chequing accounts
+	public boolean _isSwapable() {
+		return (saving != null) && (chequing != null);
+	}
+
+	// swap to saving account
+	public SavingAccount _swapToSaving(){
+		return saving;
+	}
+
+	// swap to chequing accout
+	public ChequeAccount _swapToChequing(){
+		return chequing;
+	}
 
 	// determines whether a user-specified PIN matches PIN in Account
 	public boolean validatePIN( int userPIN )

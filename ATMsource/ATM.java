@@ -1,3 +1,6 @@
+import javax.print.DocFlavor.CHAR_ARRAY;
+import javax.print.attribute.standard.MediaName;
+
 // ATM.java
 // Represents an automated teller machine
 
@@ -19,19 +22,20 @@ public class ATM
     // added new main menu option
     private static final int TRANSFER = 3;
 
-    // fourth option of different account types are,
-    // saving account: set compund frequency
-    // chequing account: set cheque limit
-    // general accout: exit
-    private static final int FORTH_OPTION = 4;
+    // for exit
+    private static final int EXIT = 0;
 
-    // exit option for cheque and saving account
-    private static final int EXIT = 5;
+    // for swaping
+    private Account swap = null;
+    private static final int SWAPTOSAVING = 8;
+    private static final int SWAPTOCHEQUING = 9;
+    private static final int NOSWAPPING = 0;
 
     // used as switch option
     private final String GENERALTYPE = "General account";
     private final String SAVINGTYPE = "Saving account";
     private final String CHEQUEINGTYPE = "Cheque account";
+    private final String BOTHTYPE = "Both";
 
 
    // no-argument ATM constructor initializes instance variables
@@ -86,7 +90,51 @@ public class ATM
         else
             screen.displayMessageLine( 
                 "Invalid account number or PIN. Please try again." );
+
+        if (bankDatabase.getAccountTypeString(currentAccountNumber)==BOTHTYPE) {
+            bankDatabase.passBalance(currentAccountNumber);
+        }
     } // end method authenticateUser
+
+    // display the main menu and perform transactions    
+    private void performTransactions(){
+
+        // Transaction currentTransaction = null;
+      
+        boolean userExited = false; // user has not chosen to exit
+
+        //int mainMenuSelection = displayMainMenu();
+
+        String type = bankDatabase.getAccountTypeString(currentAccountNumber);
+
+        //int swapSelection ;
+
+        while (!userExited) {
+            int mainMenuSelection = displayMainMenu();
+
+            switch (mainMenuSelection) {
+                case SWAPTOCHEQUING:
+                    swap = bankDatabase.swapToChequing(currentAccountNumber);
+                    performTransactions();
+                    break;
+                case SWAPTOSAVING: 
+                    swap = bankDatabase.swapToSaving(currentAccountNumber);
+                    performTransactions();
+                    break;
+                case NOSWAPPING:
+                    userExited = true;
+                    break;
+                default:
+                    // if swapped, change type to swapped account and perform related transactions.
+                    if (swap != null) {
+                        type = bankDatabase.getAccountTypeString(swap.getAccountNumber());
+                    }
+                    userExited = transactionsControl(mainMenuSelection, type);
+            }
+            mainMenuSelection = 0;
+        }
+        swap = null;
+    }
 
     private boolean transactionsControl(int mainMenuSelection, String ACtype) {
 
@@ -103,18 +151,12 @@ public class ATM
                 case WITHDRAWAL: 
                 //case DEPOSIT:
                 case TRANSFER:
-                case FORTH_OPTION:
 
                     // initialize as new object of chosen type
                     currentTransaction = 
                         createTransaction( mainMenuSelection, ACtype );
 
-                    if (currentTransaction != null) {
-                        currentTransaction.execute(); // execute transaction when is not exit signal of general account    
-                    }
-                    else {
-                        exitSignal = true;
-                    }
+                    currentTransaction.execute(); // execute transaction when is not exit signal of general account    
                     return exitSignal;
                     //break;
                 case EXIT: // user chose to terminate session
@@ -133,119 +175,95 @@ public class ATM
         return exitSignal;
     }
 
-    // display the main menu and perform transactions    
-    private void performTransactions(){
-
-        // Transaction currentTransaction = null;
-      
-        boolean userExited = false; // user has not chosen to exit
-
-        //int mainMenuSelection = displayMainMenu();
-
-        String type = bankDatabase.getAccountTypeString(currentAccountNumber);
-
-        while (!userExited) {
-            int mainMenuSelection = displayMainMenu();
-
-            userExited = transactionsControl(mainMenuSelection, type);
-        }
-    }
-   
     // display the main menu and return an input selection
     private int displayMainMenu()
     {
-        String type = bankDatabase.getAccountTypeString(currentAccountNumber);
+        // String type = bankDatabase.getAccountTypeString(currentAccountNumber);
+        String type = (swap instanceof SavingAccount) ? SAVINGTYPE : (swap instanceof ChequeAccount)? CHEQUEINGTYPE: 
+            bankDatabase.getAccountTypeString(currentAccountNumber);
 
+        swap = (swap instanceof SavingAccount)? swap = (SavingAccount) swap : (swap instanceof ChequeAccount)?
+            swap = (ChequeAccount) swap : swap;
         int selection = 0;
 
         // showing which type of current account
-        screen.displayMessageLine("\nYour account type is: " + type);
+        screen.displayMessageLine("\nYour current account type is: " + type);
 
-        switch (type) {
-            case SAVINGTYPE:
-                displayMainMenuSaving();
-                selection = keypad.getInput();// return user's selection
-                break;
-            case CHEQUEINGTYPE:
-                displayMainMenuCheque();
-                selection = keypad.getInput();// return user's selection
-                break;
-            case GENERALTYPE:
-                displayMainMenuGeneral();
-                selection = keypad.getInput();// return user's selection
-                break;
+        if (bankDatabase.isSwapable(currentAccountNumber) && swap == null) {
+            selection = swapMenu();
+        }else{
+            selection = _displayMainMenu();
         }
-        
+
         return selection;
     } // end method displayMainMenu
 
-    // menu for general account
-    private void displayMainMenuGeneral() {
-        screen.displayMessageLine( "\nMain menu:" );
-        screen.displayMessageLine( "1 - View my balance" );
-        screen.displayMessageLine( "2 - Withdraw cash" );
-        screen.displayMessageLine( "3 - Transfer funds" );
-        screen.displayMessageLine( "4 - Exit\n" );
+    private int swapMenu() {
+        screen.displayMessageLine( "\nSwap menu:" );
+        screen.displayMessageLine( "8 - Swap to saving account" );
+        screen.displayMessageLine( "9 - Swap to chequing account" );
+        screen.displayMessageLine( "0 - Exit" );
 
         screen.displayMessageLine("Please enter your choice: ");
+        return keypad.getInput();
     }
 
-    // menu for saving account
-    private void displayMainMenuSaving() {
+    // menu for every account
+    private int _displayMainMenu() {
         screen.displayMessageLine( "\nMain menu:" );
         screen.displayMessageLine( "1 - View my balance" );
         screen.displayMessageLine( "2 - Withdraw cash" );
         screen.displayMessageLine( "3 - Transfer funds" );
-        screen.displayMessageLine( "4 - Set Compound Frequency" );
-        screen.displayMessageLine( "5 - Exit\n" );
-        screen.displayMessageLine("Please enter your choice: ");
-
-    }
-
-    // menu for chequeing account
-    private void displayMainMenuCheque() {
-        screen.displayMessageLine( "\nMain menu:" );
-        screen.displayMessageLine( "1 - View my balance" );
-        screen.displayMessageLine( "2 - Withdraw cash" );
-        screen.displayMessageLine( "3 - Transfer funds" );
-        screen.displayMessageLine( "4 - Set cheque limit" );
-        screen.displayMessageLine( "5 - Exit\n" );
+        screen.displayMessageLine( "0 - Exit\n" );
 
         screen.displayMessageLine("Please enter your choice: ");
+        return keypad.getInput();
     }
          
-   // return object of specified Transaction subclass
-    private Transaction createTransaction( int type , String ACType)
+    // return object of specified Transaction subclass
+    private Transaction createTransaction( int input , String ACType)
     {
         Transaction temp = null; // temporary Transaction variable
         
         // determine which type of Transaction to create     
-        switch ( type )
-        {
-            case BALANCE_INQUIRY: // create new BalanceInquiry transaction
-                temp = new BalanceInquiry( 
-                currentAccountNumber, screen, bankDatabase );
-                break;
-            case WITHDRAWAL: // create new Withdrawal transaction
-                temp = new Withdrawal( currentAccountNumber, screen, 
-                bankDatabase, keypad, cashDispenser );
-                break; 
-            case TRANSFER: // create new Deposit transaction
-                temp = new Transfer( currentAccountNumber, screen, 
-                bankDatabase, keypad);
-                break;
-            case FORTH_OPTION:
-                if (ACType == SAVINGTYPE) {
-                    temp = new SetComFre(currentAccountNumber, screen, bankDatabase, keypad);
-                }
-                if (ACType == CHEQUEINGTYPE) {
-                    temp = new SetLimit(currentAccountNumber, screen, bankDatabase, keypad);
-                }else{
-                    break;
-                }
-        } // end switch
-
-      return temp; // return the newly created object
+        if (swap != null) {
+                switch ( input )
+                {
+                    case BALANCE_INQUIRY: // create new BalanceInquiry transaction
+                        temp = new BalanceInquiry( 
+                        swap, screen, bankDatabase );
+                        break;
+                    case WITHDRAWAL: // create new Withdrawal transaction
+                        temp = new Withdrawal( swap, screen, 
+                        bankDatabase, keypad, cashDispenser );
+                        break; 
+                    case TRANSFER: // create new Transfer transaction
+                        temp = new Transfer( swap, screen, 
+                        bankDatabase, keypad);
+                        break;
+                    case EXIT:
+                            break;
+                } // end switch
+            } else {
+                switch ( input )
+                {
+                    case BALANCE_INQUIRY: // create new BalanceInquiry transaction
+                        temp = new BalanceInquiry( 
+                        currentAccountNumber, screen, bankDatabase );
+                        break;
+                    case WITHDRAWAL: // create new Withdrawal transaction
+                        temp = new Withdrawal( currentAccountNumber, screen, 
+                        bankDatabase, keypad, cashDispenser );
+                        break; 
+                    case TRANSFER: // create new Transfer transaction
+                        temp = new Transfer( currentAccountNumber, screen, 
+                        bankDatabase, keypad);
+                        break;
+                    case EXIT:
+                            break;
+                } // end switch        
+            }
+        return temp; // return the newly created object
     } // end method createTransaction
 } // end class ATM
 

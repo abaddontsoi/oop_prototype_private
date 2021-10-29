@@ -10,12 +10,16 @@ public class BankDatabase
 	public BankDatabase()
 	{
 		accounts = new Account[ 4 ]; // just 2 accounts for default testing, and 2 for account types testing
-		accounts[ 0 ] = new Account( 12345, 54321, 1000.0, 1200.0 );
+		accounts[ 0 ] = new SavingAccount( 12345, 54321, 1000.0, 1200.0 );
+
+		// for users having general account, (i.e. neither saving nor chequing)
 		accounts[ 1 ] = new Account( 98765, 56789, 200.0, 200.0 );
 
 		// new accounts of checque account and saving account
 		accounts[ 2 ] = new ChequeAccount(2, 2, 500, 1000);
-		accounts[ 3 ] = new SavingAccount(3, 3, 2000, 2500); 
+
+		// new account for users having both saving and chequing
+		accounts[ 3 ] = new Account(3, 3, 900000, 1000000, 200000, 400000);
 
 	} // end no-argument BankDatabase constructor
 	
@@ -63,17 +67,50 @@ public class BankDatabase
 		return acFound==1;
 
 	}
+
 	// return available balance of Account with specified account number
 	public double getAvailableBalance( int userAccountNumber )
 	{
 		return getAccount( userAccountNumber ).getAvailableBalance();
 	} // end method getAvailableBalance
+	public double getAvailableBalance( Account userAccount )
+	{
+		return userAccount.getAvailableBalance();
+	} // end method getAvailableBalance
+
 
 	// return total balance of Account with specified account number
 	public double getTotalBalance( int userAccountNumber )
 	{
 		return getAccount( userAccountNumber ).getTotalBalance();
 	} // end method getTotalBalance
+	// return total balance of Account with specified account number
+	public double getTotalBalance( Account userAccount )
+	{
+			return userAccount.getTotalBalance();
+	} // end method getTotalBalance
+
+	// return saving account total balance
+	// return chequing account total balance
+	public double getTotalBalance( int userAccountNumber, String ACType )
+	{
+		
+		switch (ACType) {
+			case "Cheque account":
+			case "Saving account":
+				
+				break;
+		
+			default:
+				break;
+		}
+
+		return getAccount( userAccountNumber ).getTotalBalance();
+	} // end method getTotalBalance
+
+	public void passBalance(int bothTypeACNumber){
+		getAccount(bothTypeACNumber)._passBalance();
+	}
 
 	// credit an amount to Account with specified account number
 	public void credit( int userAccountNumber, double amount )
@@ -82,11 +119,24 @@ public class BankDatabase
 	} // end method credit
 
 	// debit an amount from of Account with specified account number
+	public void credit( Account userAccount, double amount )
+	{
+		userAccount.credit( amount );
+	} // end method debit
+
+	// debit an amount from of Account with specified account number
 	public void debit( int userAccountNumber, double amount )
 	{
 		getAccount( userAccountNumber ).debit( amount );
 	} // end method debit
 
+	// debit an amount from of Account with specified account number
+	public void debit( Account userAccount, double amount )
+	{
+		userAccount.debit( amount );
+	} // end method debit
+
+	// allows backend to set cheque limit for an account
    	public void setChequeLimit(int userAccountNumber, double amount) {
 
 		// downcasting current account to ChequeAccount for setting limit
@@ -94,20 +144,40 @@ public class BankDatabase
         temp.setLimit(amount);
    	}
 
-	// return user's account tyoe in string
+	// return user's account type in string
 	public String getAccountTypeString(int userAccountNumber) {
 		return getAccount(userAccountNumber).getType();
 	}
 
-	public void setFrequency(int currentAccountNumber, int FreSelection) {
+	// allows backend set the interest rate for an account
+	public void setInterestRate(int currentAccountNumber, int rate) {
 		SavingAccount temp = (SavingAccount) getAccount(currentAccountNumber);
-		temp.setFrequency(FreSelection);
+		temp.setInterestRate(rate);
 	}
 
+	// returns current interest rate to backend
 	public double getCurrentRate(int currentAccountNumber) {
 		SavingAccount temp = (SavingAccount) getAccount(currentAccountNumber);
 		double rate = temp.getInterestRate();
 		return rate;
+	}
+
+	// swap to saving account
+	public SavingAccount swapToSaving(int currentGeneralAC) {
+		SavingAccount temp = getAccount(currentGeneralAC)._swapToSaving();
+		return temp;
+	}
+
+	// swap to chequing account
+	public ChequeAccount swapToChequing(int currentGeneralAC) {
+		ChequeAccount temp = getAccount(currentGeneralAC)._swapToChequing();
+		return temp;
+	}
+
+	// indicates whether the account is swapable
+	public boolean isSwapable(int currentAccountNumber) {
+		boolean flag = getAccount(currentAccountNumber)._isSwapable();
+		return flag;
 	}
 } // end class BankDatabase
 

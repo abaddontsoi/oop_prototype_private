@@ -3,7 +3,6 @@ public class SavingAccount extends Account{
     private double interestRate;
 
     private static final String TYPE = "Saving account";
-    private int FREQUENCY;
 
 
     public SavingAccount(int theAccountNumber, int thePIN, 
@@ -14,12 +13,14 @@ public class SavingAccount extends Account{
         interestRate = 0.001;
     }
 
-    public double getInterestRate() {
-        return interestRate;
+    // set method of this class
+    public void setInterestRate(double rate ) {
+        interestRate = rate;
     }
 
-    public double getFre() {
-        return FREQUENCY;
+    // get method of this class
+    public double getInterestRate() {
+        return interestRate;
     }
 
     // returns account type
@@ -28,7 +29,4 @@ public class SavingAccount extends Account{
         return TYPE;
     }
 
-    public void setFrequency(int freSelection) {
-            FREQUENCY = freSelection;
-    }
 }
