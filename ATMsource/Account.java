@@ -13,7 +13,7 @@ public class Account
 	private ChequeAccount chequing = null;
 
 	// we assume existing accounts remain it original type, until the owner requests for changing
-	private static String TYPE = "General account";
+	private String TYPE = "General account";
 
 	// Account constructor initializes attributes
 	public Account( int theAccountNumber, int thePIN, 

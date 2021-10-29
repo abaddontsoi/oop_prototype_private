@@ -1,6 +1,3 @@
-import javax.print.DocFlavor.CHAR_ARRAY;
-import javax.print.attribute.standard.MediaName;
-
 // ATM.java
 // Represents an automated teller machine
 
@@ -116,10 +113,12 @@ public class ATM
                 case SWAPTOCHEQUING:
                     swap = bankDatabase.swapToChequing(currentAccountNumber);
                     performTransactions();
+                    userExited = true;
                     break;
                 case SWAPTOSAVING: 
                     swap = bankDatabase.swapToSaving(currentAccountNumber);
                     performTransactions();
+                    userExited = true;
                     break;
                 case NOSWAPPING:
                     userExited = true;
