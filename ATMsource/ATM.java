@@ -111,18 +111,24 @@ public class ATM
 
             switch (mainMenuSelection) {
                 case SWAPTOCHEQUING:
-                    swap = bankDatabase.swapToChequing(currentAccountNumber);
-                    performTransactions();
+                    if (swap == null) {
+                        swap = bankDatabase.swapToChequing(currentAccountNumber);
+                        performTransactions();
+                        break;
+                    }
                     // userExited = true;
-                    break;
-                case SWAPTOSAVING: 
-                    swap = bankDatabase.swapToSaving(currentAccountNumber);
-                    performTransactions();
+                case SWAPTOSAVING:
+                    if(swap == null){
+                        swap = bankDatabase.swapToSaving(currentAccountNumber);
+                        performTransactions();
+                        break;
+                    }
                     // userExited = true;
-                    break;
                 case NOSWAPPING:
-                    userExited = true;
-                    break;
+                    if(swap == null){
+                        userExited = true;
+                        break;
+                    }
                 default:
                     // if swapped, change type to swapped account and perform related transactions.
                     if (swap != null) {
