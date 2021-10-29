@@ -83,14 +83,14 @@ public class ATM
         if ( userAuthenticated )
         {
             currentAccountNumber = accountNumber; // save user's account #
+            if (bankDatabase.getAccountTypeString(currentAccountNumber)==BOTHTYPE) {
+                bankDatabase.passBalance(currentAccountNumber);
+            }
         } // end if
         else
             screen.displayMessageLine( 
                 "Invalid account number or PIN. Please try again." );
 
-        if (bankDatabase.getAccountTypeString(currentAccountNumber)==BOTHTYPE) {
-            bankDatabase.passBalance(currentAccountNumber);
-        }
     } // end method authenticateUser
 
     // display the main menu and perform transactions    
