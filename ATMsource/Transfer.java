@@ -79,6 +79,8 @@ public class Transfer extends Transaction {
 
                 bankDatabase.debit(subAccount, amount);
                 bankDatabase.credit(target, amount);
+
+                screen.displayMessageLine("Successful.");
             }else{
                 screen.displayMessageLine("Availavle balance is lower than transfer amount or target account unavailable.");
                 screen.displayMessageLine("Progress aborted."); 
