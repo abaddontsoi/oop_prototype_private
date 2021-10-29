@@ -113,12 +113,12 @@ public class ATM
                 case SWAPTOCHEQUING:
                     swap = bankDatabase.swapToChequing(currentAccountNumber);
                     performTransactions();
-                    userExited = true;
+                    // userExited = true;
                     break;
                 case SWAPTOSAVING: 
                     swap = bankDatabase.swapToSaving(currentAccountNumber);
                     performTransactions();
-                    userExited = true;
+                    // userExited = true;
                     break;
                 case NOSWAPPING:
                     userExited = true;
@@ -226,42 +226,42 @@ public class ATM
         
         // determine which type of Transaction to create     
         if (swap != null) {
-                switch ( input )
-                {
-                    case BALANCE_INQUIRY: // create new BalanceInquiry transaction
-                        temp = new BalanceInquiry( 
-                        swap, screen, bankDatabase );
+            switch ( input )
+            {
+                case BALANCE_INQUIRY: // create new BalanceInquiry transaction
+                    temp = new BalanceInquiry( 
+                    swap, screen, bankDatabase );
+                    break;
+                case WITHDRAWAL: // create new Withdrawal transaction
+                    temp = new Withdrawal( swap, screen, 
+                    bankDatabase, keypad, cashDispenser );
+                    break; 
+                case TRANSFER: // create new Transfer transaction
+                    temp = new Transfer( swap, screen, 
+                    bankDatabase, keypad);
+                    break;
+                case EXIT:
                         break;
-                    case WITHDRAWAL: // create new Withdrawal transaction
-                        temp = new Withdrawal( swap, screen, 
-                        bankDatabase, keypad, cashDispenser );
-                        break; 
-                    case TRANSFER: // create new Transfer transaction
-                        temp = new Transfer( swap, screen, 
-                        bankDatabase, keypad);
+            } // end switch
+        } else {
+            switch ( input )
+            {
+                case BALANCE_INQUIRY: // create new BalanceInquiry transaction
+                    temp = new BalanceInquiry( 
+                    currentAccountNumber, screen, bankDatabase );
+                    break;
+                case WITHDRAWAL: // create new Withdrawal transaction
+                    temp = new Withdrawal( currentAccountNumber, screen, 
+                    bankDatabase, keypad, cashDispenser );
+                    break; 
+                case TRANSFER: // create new Transfer transaction
+                    temp = new Transfer( currentAccountNumber, screen, 
+                    bankDatabase, keypad);
+                    break;
+                case EXIT:
                         break;
-                    case EXIT:
-                            break;
-                } // end switch
-            } else {
-                switch ( input )
-                {
-                    case BALANCE_INQUIRY: // create new BalanceInquiry transaction
-                        temp = new BalanceInquiry( 
-                        currentAccountNumber, screen, bankDatabase );
-                        break;
-                    case WITHDRAWAL: // create new Withdrawal transaction
-                        temp = new Withdrawal( currentAccountNumber, screen, 
-                        bankDatabase, keypad, cashDispenser );
-                        break; 
-                    case TRANSFER: // create new Transfer transaction
-                        temp = new Transfer( currentAccountNumber, screen, 
-                        bankDatabase, keypad);
-                        break;
-                    case EXIT:
-                            break;
-                } // end switch        
-            }
+            } // end switch        
+        }
         return temp; // return the newly created object
     } // end method createTransaction
 } // end class ATM

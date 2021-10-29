@@ -39,7 +39,7 @@ public class Withdrawal extends Transaction
    // perform transaction
    public void execute()
    {
-      boolean cashDispensed = false; // cash was not dispensed yet
+      boolean DisableDispenser = false; // cash was not dispensed yet
 
       // get references to bank database and screen
       BankDatabase bankDatabase = getBankDatabase();
@@ -56,17 +56,17 @@ public class Withdrawal extends Transaction
 
       do{
          if (flag) {
-            cashDispensed = compoundWithdraw(availableBalance, subAccount, screen, keypad, bankDatabase, cashDispensed);
+            DisableDispenser = compoundWithdraw(availableBalance, subAccount, screen, keypad, bankDatabase, DisableDispenser);
          }else{
-            cashDispensed = normalWithdraw(availableBalance, currentAccountNumber, screen, keypad, bankDatabase, cashDispensed);
+            DisableDispenser = normalWithdraw(availableBalance, currentAccountNumber, screen, keypad, bankDatabase, DisableDispenser);
          }
-      }while(!cashDispensed);
+      }while(!DisableDispenser);
 
       // loop until cash is dispensed or the user cancels
    } // end method execute
 
    private boolean normalWithdraw(double availableBalance, int currentAccountNumber, Screen screen,
-       Keypad keypad_Keypad, BankDatabase database, boolean Dispensed) {
+       Keypad keypad_Keypad, BankDatabase database, boolean disabled) {
 
          // obtain a chosen withdrawal amount from the user 
          amount = displayMenuOfAmounts();
@@ -84,7 +84,7 @@ public class Withdrawal extends Transaction
                   database.debit( getAccountNumber(), amount );
                   
                   cashDispenser.dispenseCash( amount ); // dispense cash
-                  Dispensed = true; // cash was dispensed
+                  disabled = true; // cash was dispensed
 
                   // instruct user to take cash
                   screen.displayMessageLine( 
@@ -105,13 +105,13 @@ public class Withdrawal extends Transaction
          else // user chose cancel menu option 
          {
             screen.displayMessageLine( "\nCanceling transaction..." );
-            //return; // return to main menu because user canceled
+            disabled = true; // return to main menu because user canceled
          } // end else
-      return Dispensed;
+         return disabled;
    }
 
    private boolean compoundWithdraw(double availableBalance, Account subAccount, Screen screen, Keypad keypad_Keypad, 
-      BankDatabase database, boolean Dispensed) {
+      BankDatabase database, boolean disabled) {
          // obtain a chosen withdrawal amount from the user 
          amount = displayMenuOfAmounts();
          
@@ -128,7 +128,7 @@ public class Withdrawal extends Transaction
                   database.debit( subAccount, amount );
                   
                   cashDispenser.dispenseCash( amount ); // dispense cash
-                  Dispensed = true; // cash was dispensed
+                  disabled = true; // cash was dispensed
 
                   // instruct user to take cash
                   screen.displayMessageLine( 
@@ -149,9 +149,9 @@ public class Withdrawal extends Transaction
          else // user chose cancel menu option 
          {
             screen.displayMessageLine( "\nCanceling transaction..." );
-            //return; // return to main menu because user canceled
+            disabled = true; // return to main menu because user canceled
          } // end else
-      return Dispensed;
+      return disabled;
    }
 
    // display a menu of withdrawal amounts and the option to cancel;
