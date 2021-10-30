@@ -118,7 +118,7 @@ public class BankDatabase
 		getAccount( userAccountNumber ).credit( amount );
 	} // end method credit
 
-	// debit an amount from of Account with specified account number
+	// debit an amount from of Account with specified account
 	public void credit( Account userAccount, double amount )
 	{
 		userAccount.credit( amount );
@@ -130,7 +130,7 @@ public class BankDatabase
 		getAccount( userAccountNumber ).debit( amount );
 	} // end method debit
 
-	// debit an amount from of Account with specified account number
+	// debit an amount from of Account with specified account
 	public void debit( Account userAccount, double amount )
 	{
 		userAccount.debit( amount );
