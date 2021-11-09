@@ -50,6 +50,8 @@ public class Transfer extends Transaction {
             if (isSufficientTransfer(amount, availableBalance) && bankDatabase.accountExists(target) && target != accountNumber) {
                 bankDatabase.debit(accountNumber, amount);
                 bankDatabase.credit(target, amount);
+
+                screen.displayMessageLine("Successful.");
             }else{
                 screen.displayMessageLine("Availavle balance is lower than transfer amount or target account unavailable.");
                 screen.displayMessageLine("Progress aborted."); 
