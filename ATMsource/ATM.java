@@ -1,3 +1,6 @@
+import javax.swing.ActionMap;
+import javax.xml.transform.Templates;
+
 // ATM.java
 // Represents an automated teller machine
 
@@ -29,7 +32,7 @@ public class ATM
     private static final int NOSWAPPING = 0;
 
     // used as switch option
-    private final String GENERALTYPE = "General account";
+    // private final String GENERALTYPE = "General account";
     private final String SAVINGTYPE = "Saving account";
     private final String CHEQUEINGTYPE = "Cheque account";
     private final String BOTHTYPE = "Both";
@@ -56,25 +59,32 @@ public class ATM
             // loop while user is not yet authenticated
             while ( !userAuthenticated ) 
             {
-                screen.displayMessageLine( "\nWelcome!" );       
+                screen.displayWindowsyMessage("Please login.");
                 authenticateUser(); // authenticate user
             } // end while
-         
-            performTransactions(); // user is now authenticated 
-            userAuthenticated = false; // reset before next ATM session
-            currentAccountNumber = 0; // reset before next ATM session 
-            screen.displayMessageLine( "\nThank you! Goodbye!" );
+            resetKeypad();
+
+            if (userAuthenticated) {
+                performTransactions(); 
+                userAuthenticated = false; // reset before next ATM session
+                currentAccountNumber = 0; // reset before next ATM session 
+                screen.displayMessageLine( "\nThank you! Goodbye!" );
+            } 
+            //performTransactions(); // user is now authenticated 
         } // end while   
     } // end method run
 
     // attempts to authenticate user against database
     private void authenticateUser() 
     {
+        resetKeypad();
         screen.displayMessage( "\nPlease enter your account number: " );
+        keypad.showKeypad();
         int accountNumber = keypad.getInput(); // input account number
+        resetKeypad();
         screen.displayMessage( "\nEnter your PIN: " ); // prompt for PIN
         int pin = keypad.getInput(); // input PIN
-        
+        keypad = null;
         // set userAuthenticated to boolean value returned by database
         userAuthenticated = 
             bankDatabase.authenticateUser( accountNumber, pin );
@@ -90,7 +100,6 @@ public class ATM
         else
             screen.displayMessageLine( 
                 "Invalid account number or PIN. Please try again." );
-
     } // end method authenticateUser
 
     // display the main menu and perform transactions    
@@ -270,6 +279,11 @@ public class ATM
         }
         return temp; // return the newly created object
     } // end method createTransaction
+
+    private void resetKeypad(){
+        keypad = null;
+        keypad = new Keypad();
+    }
 } // end class ATM
 
 

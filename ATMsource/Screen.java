@@ -1,8 +1,36 @@
 // Screen.java
 // Represents the screen of the ATM
+import java.awt.*;
+import javax.swing.*;
 
 public class Screen
 {
+   JFrame frame ;
+   String tittleString;
+   JTextArea displayArea = new JTextArea();
+   boolean inputdisabled = false;
+
+   public Screen(String tittleString, boolean disabled){
+      inputdisabled = disabled;
+
+      frame = new JFrame(tittleString);
+      frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+      frame.setSize(500, 500);
+      displayArea.enableInputMethods(inputdisabled);
+      frame.add(displayArea);
+
+      frame.setVisible(true);
+   }
+
+   public Screen(){
+
+   }
+
+   public void displayWindowsyMessage(String messageString) {
+      JOptionPane.showMessageDialog(frame, messageString, "ATM - Dialog", JOptionPane.PLAIN_MESSAGE);
+      //JOptionPane.showMessageDialog(parentComponent, message, title, messageType, icon);
+   }
+
    // displays a message without a carriage return
    public void displayMessage( String message ) 
    {
