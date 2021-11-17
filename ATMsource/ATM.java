@@ -72,7 +72,6 @@ public class ATM extends JFrame
     {
         ButtonHlr bthlr = new ButtonHlr(); 
         EnterHlr ethlr = new EnterHlr(); 
-        setLayout(new GridBagLayout());
         keypadPanel.setLayout(new GridLayout(4,3));
 		for (int i = 0; i < buttonGP.length; i++) {
 			keypadPanel.add(buttonGP[i]);
@@ -84,6 +83,7 @@ public class ATM extends JFrame
 		}
         screenPanel.setLayout(new GridLayout(1,1));
         screenPanel.setSize(400, 400);
+        screenPanel.add(new JTextArea());
 
         setDefaultCloseOperation(EXIT_ON_CLOSE);
         setSize(800,800);
