@@ -16,16 +16,16 @@ public class Keypad extends JPanel
 		new JButton("1"),
 		new JButton("2"),
 		new JButton("3"),
+		new JButton("Enter"),
 		new JButton("4"),
 		new JButton("5"),
 		new JButton("6"),
+		new JButton("Cancel"),
 		new JButton("7"),
 		new JButton("8"),
 		new JButton("9"),
-		new JButton("Enter"),
-		new JButton("0"),
 		new JButton("."),
-		new JButton("Cancel")
+		new JButton("0")
 	};
 
 	// private JFrame displayObject = new JFrame();
@@ -34,7 +34,7 @@ public class Keypad extends JPanel
 	public int intBuffer;
 	public double douBuffer;
 	public String sBuffer = "";
-	private boolean confirmSignal = false; 
+	public boolean confirmSignal = false; 
 
 	// no-argument constructor initializes the Scanner
 	public Keypad()
@@ -49,10 +49,15 @@ public class Keypad extends JPanel
 
 	public void placeComponent(){
 		ButtonHandler bthlr = new ButtonHandler();
+		EnterHandler ethlr = new EnterHandler();
 		setLayout(new GridLayout(4,3));
 		for (int i = 0; i < buttonGP.length; i++) {
 			add(buttonGP[i]);
-			buttonGP[i].addActionListener(bthlr);
+			if (i != 3) {
+				buttonGP[i].addActionListener(bthlr);
+			}else{
+				buttonGP[i].addActionListener(ethlr);
+			}
 		}
 	}
 
@@ -62,6 +67,17 @@ public class Keypad extends JPanel
 		return input.nextInt(); // we assume that user enters an integer  
 	} // end method getInput
 
+	public int getGUIinput(){
+		return intBuffer;
+	}
+
+	public int waitForReturn(){
+		while (!confirmSignal) {
+			continue;
+		}
+		return intBuffer;
+	}
+
 	public double getDoubleInput() {
 		return input.nextInt();
 	}
@@ -70,37 +86,43 @@ public class Keypad extends JPanel
 	private class ButtonHandler implements ActionListener{
 		public void actionPerformed( ActionEvent event )
         {
+			// waitForReturn();
             JButton src = (JButton)event.getSource();
-			if (!sBuffer.contains(".") && src.getActionCommand() != "Enter" 
+			if (!sBuffer.contains(".")  
 				&& src.getActionCommand() != "." && src.getActionCommand() != "Cancel") {
 				sBuffer += src.getActionCommand();
 				intBuffer = Integer.parseInt(sBuffer);
-				System.out.print(sBuffer);
+				// System.out.print(sBuffer);
 			}
-			if (src.getActionCommand() == "." || sBuffer.contains(".")
-				&& src.getActionCommand() != "Cancel") {
+			if ((src.getActionCommand() == "." || sBuffer.contains("."))
+				&& src.getActionCommand() != "Cancel" ) {
 				disableDot(true);
 				sBuffer += src.getActionCommand();
 				douBuffer = Double.parseDouble(sBuffer);
-				System.out.print(sBuffer);
-			}
-			if (src.getActionCommand() == "Enter") {
-				confirm();
+				// System.out.print(sBuffer);
 			}
 			if (src.getActionCommand() == "Cancel") {
-				cancael();
+				cancel();
 			}
         } // end method actionPerformed
 	}
-
+	private class EnterHandler implements ActionListener {
+		@Override
+		public void actionPerformed(ActionEvent e) {
+			// TODO Auto-generated method stub
+			confirm();
+			cancel();
+		}
+	}
 	public void confirm() {
 		confirmSignal = true;
 	}
 
-	public void cancael() {
+	public void cancel() {
 		sBuffer = "";
 		intBuffer = 0;
 		douBuffer = 0;
+		// disableDot(false);
 	}
 
 	public void disableDot(boolean b) {

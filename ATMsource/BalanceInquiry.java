@@ -45,12 +45,12 @@ public class BalanceInquiry extends Transaction
             bankDatabase.getTotalBalance( getAccountNumber() );
       }
       // display the balance information on the screen
-      screen.displayWindowsMessage( "\nBalance Information:" );
+      screen.displayDialogMessage( "\nBalance Information:" );
       screen.displayMessage( " - Available balance: " ); 
       screen.displayDollarAmount( availableBalance );
       screen.displayMessage( "\n - Total balance:     " );
       screen.displayDollarAmount( totalBalance );
-      screen.displayWindowsMessage( "" );
+      screen.displayDialogMessage( "" );
    } // end method execute
 } // end class BalanceInquiry
 

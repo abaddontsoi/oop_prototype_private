@@ -1,6 +1,7 @@
 import java.awt.*;
-
 import javax.swing.*;
+import java.awt.event.ActionListener;
+import java.awt.event.ActionEvent;
 // ATM.java
 // Represents an automated teller machine
 
@@ -38,29 +39,115 @@ public class ATM extends JFrame
     //components of ATM
     //private JFrame ATMFrame = new JFrame();
     private Keypad keypad = new Keypad(); // ATM's keypad
-    private Screen screen = new Screen(); // ATM's screen
-    private JPanel panel = new JPanel();
+    private Screen screen = new Screen(true); // ATM's screen
+    private JPanel keypadPanel = new JPanel();
+    private JPanel screenPanel = new JPanel();
+    private int accountNumber = 0;
+    private int pin = 0;
+    private JButton[] buttonGP = 
+	{
+		new JButton("1"),
+		new JButton("2"),
+		new JButton("3"),
+		new JButton("Enter"),
+		new JButton("4"),
+		new JButton("5"),
+		new JButton("6"),
+		new JButton("Cancel"),
+		new JButton("7"),
+		new JButton("8"),
+		new JButton("9"),
+		new JButton("."),
+		new JButton("0")
+	};
+    public int intBuffer;
+	public double douBuffer;
+	public String sBuffer = "";
+	public boolean confirmSignal = false; 
+
 
 
    // no-argument ATM constructor initializes instance variables
     public ATM() 
     {
+        ButtonHlr bthlr = new ButtonHlr(); 
+        EnterHlr ethlr = new EnterHlr(); 
+        setLayout(new GridBagLayout());
+        keypadPanel.setLayout(new GridLayout(4,3));
+		for (int i = 0; i < buttonGP.length; i++) {
+			keypadPanel.add(buttonGP[i]);
+			if (i != 3) {
+                buttonGP[i].addActionListener(bthlr);
+			}else{
+                buttonGP[i].addActionListener(ethlr);
+			}
+		}
+        screenPanel.setLayout(new GridLayout(1,1));
+        screenPanel.setSize(400, 400);
+
         setDefaultCloseOperation(EXIT_ON_CLOSE);
-        setSize(300,300);
+        setSize(800,800);
         setLayout(new GridLayout(1,2));
-        add(screen);
-        add(keypad);
+        //add(screen);
+        //add(keypad);
+        add(screenPanel);
+        add(keypadPanel);
 
         userAuthenticated = false; // user is not authenticated to start
         currentAccountNumber = 0; // no current account number to startcashDispenser = new CashDispenser(); // create cash dispenser
         //depositSlot = new DepositSlot(); // create deposit slot
         bankDatabase = new BankDatabase(); // create acct info database
+        cashDispenser = new CashDispenser(); // create new dispenser
         setVisible(true);
     } // end no-argument ATM constructor
+
+    private class ButtonHlr implements ActionListener{
+        @Override
+        public void actionPerformed(ActionEvent e) {
+            // TODO Auto-generated method stub
+            JButton src = (JButton)e.getSource();
+			if (!sBuffer.contains(".")  
+				&& src.getActionCommand() != "." && src.getActionCommand() != "Cancel") {
+				sBuffer += src.getActionCommand();
+				intBuffer = Integer.parseInt(sBuffer);
+				// System.out.print(sBuffer);
+			}
+			if ((src.getActionCommand() == "." || sBuffer.contains("."))
+				&& src.getActionCommand() != "Cancel" ) {
+				disableDot(true);
+				sBuffer += src.getActionCommand();
+				douBuffer = Double.parseDouble(sBuffer);
+				// System.out.print(sBuffer);
+			}
+			if (src.getActionCommand() == "Cancel") {
+				cancel();
+			}
+
+        }
+    }
+    private class EnterHlr implements ActionListener{
+        @Override
+        public void actionPerformed(ActionEvent e) {
+            // TODO Auto-generated method stub
+            confirmSignal = true;
+			cancel();
+        }
+    }
+
+    public void cancel() {
+		sBuffer = "";
+		intBuffer = 0;
+		douBuffer = 0;
+		// disableDot(false);
+	}
+	public void disableDot(boolean b) {
+		buttonGP[11].setEnabled(!b);
+	}
 
     // start ATM 
     public void run()
     {
+        keypad.showKeypad();
         // welcome and authenticate user; perform transactions
         while ( true )
         {
@@ -82,14 +169,11 @@ public class ATM extends JFrame
     // attempts to authenticate user against database
     private void authenticateUser() 
     {
-        keypad.disableDot(false);
-        screen.displayMessage( "\nPlease enter your account number: " );
-        keypad.showKeypad();
-        int accountNumber = keypad.getInput(); // input account number
-        // resetKeypad();
-        screen.displayMessage( "\nEnter your PIN: " ); // prompt for PIN
-        int pin = keypad.getInput(); // input PIN
-        // set userAuthenticated to boolean value returned by database
+        screen.displayDialogMessage( "\nPlease enter your account number: " );
+        accountNumber = keypad.getInput();
+        screen.displayDialogMessage( "\nEnter your PIN: " ); // prompt for PIN
+        pin = keypad.getInput(); // set userAuthenticated to boolean value returned by database
+
         userAuthenticated = 
             bankDatabase.authenticateUser( accountNumber, pin );
         
@@ -102,8 +186,10 @@ public class ATM extends JFrame
             }
         } // end if
         else
-            screen.displayWindowsMessage( 
+            screen.displayDialogMessage( 
                 "Invalid account number or PIN. Please try again." );
+            System.out.println(accountNumber);
+            System.out.println(pin);
     } // end method authenticateUser
 
     // display the main menu and perform transactions    
@@ -178,13 +264,13 @@ public class ATM extends JFrame
                     return exitSignal;
                     //break;
                 case EXIT: // user chose to terminate session
-                    screen.displayWindowsMessage( "\nExiting the system..." );
+                    screen.displayDialogMessage( "\nExiting the system..." );
                     exitSignal = true; // this ATM session should end
                     return exitSignal;
 
                     //break;
                 default: // user did not enter an integer from 1-4
-                    screen.displayWindowsMessage( 
+                    screen.displayDialogMessage( 
                     "\nYou did not enter a valid selection. Try again." );
                     return exitSignal;
                     //break;
@@ -205,7 +291,7 @@ public class ATM extends JFrame
         int selection = 0;
 
         // showing which type of current account
-        screen.displayWindowsMessage("\nYour current account type is: " + type);
+        screen.displayDialogMessage("\nYour current account type is: " + type);
 
         if (bankDatabase.isSwapable(currentAccountNumber) && swap == null) {
             selection = swapMenu();
@@ -217,24 +303,24 @@ public class ATM extends JFrame
     } // end method displayMainMenu
 
     private int swapMenu() {
-        screen.displayWindowsMessage( "\nSwap menu:" );
-        screen.displayWindowsMessage( "8 - Swap to saving account" );
-        screen.displayWindowsMessage( "9 - Swap to chequing account" );
-        screen.displayWindowsMessage( "0 - Exit" );
+        screen.displayDialogMessage( "\nSwap menu:" );
+        screen.displayDialogMessage( "8 - Swap to saving account" );
+        screen.displayDialogMessage( "9 - Swap to chequing account" );
+        screen.displayDialogMessage( "0 - Exit" );
 
-        screen.displayWindowsMessage("Please enter your choice: ");
+        screen.displayDialogMessage("Please enter your choice: ");
         return keypad.getInput();
     }
 
     // menu for every account
     private int _displayMainMenu() {
-        screen.displayWindowsMessage( "\nMain menu:" );
-        screen.displayWindowsMessage( "1 - View my balance" );
-        screen.displayWindowsMessage( "2 - Withdraw cash" );
-        screen.displayWindowsMessage( "3 - Transfer funds" );
-        screen.displayWindowsMessage( "0 - Exit\n" );
+        screen.displayDialogMessage( "\nMain menu:" );
+        screen.displayDialogMessage( "\n1 - View my balance" );
+        screen.displayDialogMessage( "\n2 - Withdraw cash" );
+        screen.displayDialogMessage( "\n3 - Transfer funds" );
+        screen.displayDialogMessage( "\n0 - Exit\n" );
 
-        screen.displayWindowsMessage("Please enter your choice: ");
+        screen.displayDialogMessage("Please enter your choice: ");
         return keypad.getInput();
     }
          

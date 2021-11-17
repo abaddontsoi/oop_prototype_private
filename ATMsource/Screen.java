@@ -8,24 +8,27 @@ public class Screen extends JPanel
    // JFrame frame ;
    // String tittleString;
    JTextArea displayArea = new JTextArea();
-   boolean inputdisabled = false;
+   boolean inputenabled = true;
 
-   public Screen(String tittleString, boolean disabled){
-      
-      inputdisabled = disabled;
-      displayArea.enableInputMethods(!inputdisabled);
+
+   public Screen(){
+      displayArea.setEditable(inputenabled);
       add(displayArea);
       setVisible(true);
    }
 
-   public Screen(){
-      displayArea.enableInputMethods(inputdisabled);
+   public Screen(boolean disabled){
+      
+      this();
+      inputenabled = !disabled;
+      displayArea.setEditable(inputenabled);
       add(displayArea);
       setVisible(true);
    }
 
    public void displayDialogMessage(String messageString) {
       displayArea.append(messageString);
+      displayArea.append("\n");
       // displayArea.setText(messageString);
    }
 
