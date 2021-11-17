@@ -1,15 +1,13 @@
-import javax.swing.ActionMap;
-import javax.xml.transform.Templates;
+import java.awt.*;
 
+import javax.swing.*;
 // ATM.java
 // Represents an automated teller machine
 
-public class ATM 
+public class ATM extends JFrame 
 {
     private boolean userAuthenticated; // whether user is authenticated
     private int currentAccountNumber; // current user's account number
-    private Screen screen; // ATM's screen
-    private Keypad keypad; // ATM's keypad
     private CashDispenser cashDispenser; // ATM's cash dispenser
     //private DepositSlot depositSlot; // ATM's deposit slot
     private BankDatabase bankDatabase; // account information database
@@ -37,17 +35,27 @@ public class ATM
     private final String CHEQUEINGTYPE = "Cheque account";
     private final String BOTHTYPE = "Both";
 
+    //components of ATM
+    //private JFrame ATMFrame = new JFrame();
+    private Keypad keypad = new Keypad(); // ATM's keypad
+    private Screen screen = new Screen(); // ATM's screen
+    private JPanel panel = new JPanel();
+
 
    // no-argument ATM constructor initializes instance variables
     public ATM() 
     {
+        setDefaultCloseOperation(EXIT_ON_CLOSE);
+        setSize(300,300);
+        setLayout(new GridLayout(1,2));
+        add(screen);
+        add(keypad);
+
         userAuthenticated = false; // user is not authenticated to start
-        currentAccountNumber = 0; // no current account number to start
-        screen = new Screen(); // create screen
-        keypad = new Keypad(); // create keypad 
-        cashDispenser = new CashDispenser(); // create cash dispenser
+        currentAccountNumber = 0; // no current account number to startcashDispenser = new CashDispenser(); // create cash dispenser
         //depositSlot = new DepositSlot(); // create deposit slot
         bankDatabase = new BankDatabase(); // create acct info database
+        setVisible(true);
     } // end no-argument ATM constructor
 
     // start ATM 
@@ -59,32 +67,28 @@ public class ATM
             // loop while user is not yet authenticated
             while ( !userAuthenticated ) 
             {
-                screen.displayWindowsyMessage("Please login.");
+                screen.displayDialogMessage("Please login.");
+                keypad.disableDot(true);
                 authenticateUser(); // authenticate user
             } // end while
-            resetKeypad();
 
-            if (userAuthenticated) {
-                performTransactions(); 
-                userAuthenticated = false; // reset before next ATM session
-                currentAccountNumber = 0; // reset before next ATM session 
-                screen.displayMessageLine( "\nThank you! Goodbye!" );
-            } 
-            //performTransactions(); // user is now authenticated 
+            performTransactions(); 
+            userAuthenticated = false; // reset before next ATM session
+            currentAccountNumber = 0; // reset before next ATM session 
+            screen.displayDialogMessage( "\nThank you! Goodbye!" );
         } // end while   
     } // end method run
 
     // attempts to authenticate user against database
     private void authenticateUser() 
     {
-        resetKeypad();
+        keypad.disableDot(false);
         screen.displayMessage( "\nPlease enter your account number: " );
         keypad.showKeypad();
         int accountNumber = keypad.getInput(); // input account number
-        resetKeypad();
+        // resetKeypad();
         screen.displayMessage( "\nEnter your PIN: " ); // prompt for PIN
         int pin = keypad.getInput(); // input PIN
-        keypad = null;
         // set userAuthenticated to boolean value returned by database
         userAuthenticated = 
             bankDatabase.authenticateUser( accountNumber, pin );
@@ -98,7 +102,7 @@ public class ATM
             }
         } // end if
         else
-            screen.displayMessageLine( 
+            screen.displayWindowsMessage( 
                 "Invalid account number or PIN. Please try again." );
     } // end method authenticateUser
 
@@ -174,13 +178,13 @@ public class ATM
                     return exitSignal;
                     //break;
                 case EXIT: // user chose to terminate session
-                    screen.displayMessageLine( "\nExiting the system..." );
+                    screen.displayWindowsMessage( "\nExiting the system..." );
                     exitSignal = true; // this ATM session should end
                     return exitSignal;
 
                     //break;
                 default: // user did not enter an integer from 1-4
-                    screen.displayMessageLine( 
+                    screen.displayWindowsMessage( 
                     "\nYou did not enter a valid selection. Try again." );
                     return exitSignal;
                     //break;
@@ -201,7 +205,7 @@ public class ATM
         int selection = 0;
 
         // showing which type of current account
-        screen.displayMessageLine("\nYour current account type is: " + type);
+        screen.displayWindowsMessage("\nYour current account type is: " + type);
 
         if (bankDatabase.isSwapable(currentAccountNumber) && swap == null) {
             selection = swapMenu();
@@ -213,24 +217,24 @@ public class ATM
     } // end method displayMainMenu
 
     private int swapMenu() {
-        screen.displayMessageLine( "\nSwap menu:" );
-        screen.displayMessageLine( "8 - Swap to saving account" );
-        screen.displayMessageLine( "9 - Swap to chequing account" );
-        screen.displayMessageLine( "0 - Exit" );
+        screen.displayWindowsMessage( "\nSwap menu:" );
+        screen.displayWindowsMessage( "8 - Swap to saving account" );
+        screen.displayWindowsMessage( "9 - Swap to chequing account" );
+        screen.displayWindowsMessage( "0 - Exit" );
 
-        screen.displayMessageLine("Please enter your choice: ");
+        screen.displayWindowsMessage("Please enter your choice: ");
         return keypad.getInput();
     }
 
     // menu for every account
     private int _displayMainMenu() {
-        screen.displayMessageLine( "\nMain menu:" );
-        screen.displayMessageLine( "1 - View my balance" );
-        screen.displayMessageLine( "2 - Withdraw cash" );
-        screen.displayMessageLine( "3 - Transfer funds" );
-        screen.displayMessageLine( "0 - Exit\n" );
+        screen.displayWindowsMessage( "\nMain menu:" );
+        screen.displayWindowsMessage( "1 - View my balance" );
+        screen.displayWindowsMessage( "2 - Withdraw cash" );
+        screen.displayWindowsMessage( "3 - Transfer funds" );
+        screen.displayWindowsMessage( "0 - Exit\n" );
 
-        screen.displayMessageLine("Please enter your choice: ");
+        screen.displayWindowsMessage("Please enter your choice: ");
         return keypad.getInput();
     }
          
@@ -279,11 +283,6 @@ public class ATM
         }
         return temp; // return the newly created object
     } // end method createTransaction
-
-    private void resetKeypad(){
-        keypad = null;
-        keypad = new Keypad();
-    }
 } // end class ATM
 
 

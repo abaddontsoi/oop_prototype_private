@@ -3,32 +3,30 @@
 import java.awt.*;
 import javax.swing.*;
 
-public class Screen
+public class Screen extends JPanel
 {
-   JFrame frame ;
-   String tittleString;
+   // JFrame frame ;
+   // String tittleString;
    JTextArea displayArea = new JTextArea();
    boolean inputdisabled = false;
 
    public Screen(String tittleString, boolean disabled){
+      
       inputdisabled = disabled;
-
-      frame = new JFrame(tittleString);
-      frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-      frame.setSize(500, 500);
-      displayArea.enableInputMethods(inputdisabled);
-      frame.add(displayArea);
-
-      frame.setVisible(true);
+      displayArea.enableInputMethods(!inputdisabled);
+      add(displayArea);
+      setVisible(true);
    }
 
    public Screen(){
-
+      displayArea.enableInputMethods(inputdisabled);
+      add(displayArea);
+      setVisible(true);
    }
 
-   public void displayWindowsyMessage(String messageString) {
-      JOptionPane.showMessageDialog(frame, messageString, "ATM - Dialog", JOptionPane.PLAIN_MESSAGE);
-      //JOptionPane.showMessageDialog(parentComponent, message, title, messageType, icon);
+   public void displayDialogMessage(String messageString) {
+      displayArea.append(messageString);
+      // displayArea.setText(messageString);
    }
 
    // displays a message without a carriage return
@@ -38,9 +36,11 @@ public class Screen
    } // end method displayMessage
 
    // display a message with a carriage return
-   public void displayMessageLine( String message ) 
+   public void displayWindowsMessage( String message ) 
    {
-      System.out.println( message );   
+      System.out.println( message );
+      
+      displayArea.append(message);
    } // end method displayMessageLine
 
    // display a dollar amount

@@ -51,16 +51,16 @@ public class Transfer extends Transaction {
                 bankDatabase.debit(accountNumber, amount);
                 bankDatabase.credit(target, amount);
 
-                screen.displayMessageLine("Successful.");
+                screen.displayWindowsMessage("Successful.");
             }else{
-                screen.displayMessageLine("Availavle balance is lower than transfer amount or target account unavailable.");
-                screen.displayMessageLine("Progress aborted."); 
+                screen.displayWindowsMessage("Availavle balance is lower than transfer amount or target account unavailable.");
+                screen.displayWindowsMessage("Progress aborted."); 
             }
 
         } catch (Exception e) {
 
             // to maintain all inputs are integer, fund with cents are not considered
-            screen.displayMessageLine("Input mismatch! In normal mode.");
+            screen.displayWindowsMessage("Input mismatch! In normal mode.");
             amount = 0;
         }
     }
@@ -82,15 +82,15 @@ public class Transfer extends Transaction {
                 bankDatabase.debit(subAccount, amount);
                 bankDatabase.credit(target, amount);
 
-                screen.displayMessageLine("Successful.");
+                screen.displayWindowsMessage("Successful.");
             }else{
-                screen.displayMessageLine("Availavle balance is lower than transfer amount or target account unavailable.");
-                screen.displayMessageLine("Progress aborted."); 
+                screen.displayWindowsMessage("Availavle balance is lower than transfer amount or target account unavailable.");
+                screen.displayWindowsMessage("Progress aborted."); 
             }
 
         } catch (Exception e) {
 
-            screen.displayMessageLine("Input mismatch! In compoud mode.");
+            screen.displayWindowsMessage("Input mismatch! In compoud mode.");
             amount = 0;
         }
 

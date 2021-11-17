@@ -1,20 +1,15 @@
 // Keypad.java
 // Represents the keypad of the ATM
 import java.util.Scanner; // program uses Scanner to obtain user input
-import java.util.concurrent.Flow;
-import java.util.logging.Handler;
 import java.awt.*;
 import java.awt.event.ActionListener;
-import java.nio.Buffer;
 import java.awt.event.ActionEvent;
 
-import javax.security.auth.Subject;
 import javax.swing.*;
 
-public class Keypad 
+public class Keypad extends JPanel
 {
-	private	JFrame keypadFrame = new JFrame(); 
-	private JPanel panel = new JPanel();
+	// private	JFrame keypadFrame = new JFrame(); 
 	private Scanner input; // reads data from the command line
 	private JButton[] buttonGP = 
 	{
@@ -29,42 +24,34 @@ public class Keypad
 		new JButton("9"),
 		new JButton("Enter"),
 		new JButton("0"),
-		new JButton(".")
-
+		new JButton("."),
+		new JButton("Cancel")
 	};
 
-	JFrame displayObject = new JFrame();
-	JPanel screenPanel = new JPanel();
-	public JTextArea TA = new JTextArea("100");
+	// private JFrame displayObject = new JFrame();
+	private JPanel screenPanel = new JPanel();
 
 	public int intBuffer;
-	public String sBuffer; 
+	public double douBuffer;
+	public String sBuffer = "";
+	private boolean confirmSignal = false; 
 
 	// no-argument constructor initializes the Scanner
 	public Keypad()
 	{
-		TA.setSize(250,250);
 		screenPanel.setVisible(true);
-		screenPanel.add(TA);
-
-		keypadFrame.setLayout(new FlowLayout());
-		keypadFrame.add(panel);
-		keypadFrame.add(screenPanel);
 		input = new Scanner( System.in ); // for command line input, will be removed    
 	} // end no-argument Keypad constructor
 
 	public void showKeypad(){
-		keypadFrame.setSize(500,500);
-		keypadFrame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 		placeComponent();
-		keypadFrame.setVisible(true);
 	}
 
 	public void placeComponent(){
 		ButtonHandler bthlr = new ButtonHandler();
-		panel.setLayout(new GridLayout(4,3));
+		setLayout(new GridLayout(4,3));
 		for (int i = 0; i < buttonGP.length; i++) {
-			panel.add(buttonGP[i]);
+			add(buttonGP[i]);
 			buttonGP[i].addActionListener(bthlr);
 		}
 	}
@@ -79,15 +66,45 @@ public class Keypad
 		return input.nextInt();
 	}
 
+	//private inner class
 	private class ButtonHandler implements ActionListener{
 		public void actionPerformed( ActionEvent event )
         {
             JButton src = (JButton)event.getSource();
-			sBuffer = src.getActionCommand();
-			System.out.println(sBuffer);
-			intBuffer = Integer.parseInt(sBuffer);
-			TA.setText(sBuffer);
+			if (!sBuffer.contains(".") && src.getActionCommand() != "Enter" 
+				&& src.getActionCommand() != "." && src.getActionCommand() != "Cancel") {
+				sBuffer += src.getActionCommand();
+				intBuffer = Integer.parseInt(sBuffer);
+				System.out.print(sBuffer);
+			}
+			if (src.getActionCommand() == "." || sBuffer.contains(".")
+				&& src.getActionCommand() != "Cancel") {
+				disableDot(true);
+				sBuffer += src.getActionCommand();
+				douBuffer = Double.parseDouble(sBuffer);
+				System.out.print(sBuffer);
+			}
+			if (src.getActionCommand() == "Enter") {
+				confirm();
+			}
+			if (src.getActionCommand() == "Cancel") {
+				cancael();
+			}
         } // end method actionPerformed
+	}
+
+	public void confirm() {
+		confirmSignal = true;
+	}
+
+	public void cancael() {
+		sBuffer = "";
+		intBuffer = 0;
+		douBuffer = 0;
+	}
+
+	public void disableDot(boolean b) {
+		buttonGP[11].setEnabled(!b);
 	}
 	
 } // end class Keypad  
