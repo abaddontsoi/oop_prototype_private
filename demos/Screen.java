@@ -13,8 +13,8 @@ public class Screen extends JPanel
    // copy from demo
    private JPanel outputPanel = new JPanel();
    private JPanel inputPanel = new JPanel();
-   private JTextArea opArea = new JTextArea();
-   private JTextField ipField = new JTextField(100);
+   public JTextArea opArea = new JTextArea();
+   public JTextField ipField = new JTextField(100);
 
 
 
@@ -70,7 +70,7 @@ public class Screen extends JPanel
    public void displayWindowsMessage( String message ) 
    {
       System.out.println( message );
-      
+      opArea.setText("");
       opArea.append(message);
    } // end method displayMessageLine
 

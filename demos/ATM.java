@@ -4,6 +4,7 @@ import java.awt.event.ActionListener;
 import java.awt.event.ActionEvent;
 
 public class ATM extends JFrame {
+    private Keypad testKeypad = new Keypad();
     private Screen screenPanel = new Screen();
 
     private JPanel keyPanel = new JPanel();
@@ -25,7 +26,6 @@ public class ATM extends JFrame {
     private BankDatabase bankDatabase;
     private CashDispenser cashDispenser;
     protected boolean userAuthenticated = false; // whether user is authenticated
-
     private int currentAccountNumber;
 
     // for swaping
@@ -75,6 +75,17 @@ public class ATM extends JFrame {
         rightPanel.setVisible(true);
         add(screenPanel);
         add(rightPanel);
+        if (!userAuthenticated) {
+            disableDot(true);
+            screenPanel.displayWindowsMessage( "\nWelcome.");
+            screenPanel.displayWindowsMessage( 
+                "\nWelcome." +
+                "\nPlease login." + 
+                "\nEnter your user ID: \n" ); // prompt for PIN
+        }
+        if(userAuthenticated){
+
+        }
     }
 
     public static void main(String[] args) {
@@ -89,15 +100,15 @@ public class ATM extends JFrame {
             JButton src = (JButton)e.getSource();
 			if (!sBuffer.contains(".")  
 				&& src.getActionCommand() != "." && src.getActionCommand() != "Cancel") {
-				sBuffer += src.getActionCommand();
-				intBuffer = Integer.parseInt(sBuffer);
-				//System.out.print(sBuffer);
+				screenPanel.ipField.setText(screenPanel.ipField.getText() + src.getActionCommand());
+				intBuffer = Integer.parseInt(screenPanel.ipField.getText());
+				// System.out.print(sBuffer);
 			}
 			if ((src.getActionCommand() == "." || sBuffer.contains("."))
 				&& src.getActionCommand() != "Cancel" ) {
 				disableDot(true);
-				sBuffer += src.getActionCommand();
-				douBuffer = Double.parseDouble(sBuffer);
+				screenPanel.ipField.setText(screenPanel.ipField.getText() + src.getActionCommand());
+				douBuffer = Double.parseDouble(screenPanel.ipField.getText());
 				// System.out.print(sBuffer);
 			}
 			if (src.getActionCommand() == "Cancel") {
@@ -110,15 +121,8 @@ public class ATM extends JFrame {
     private class enterbthlr implements ActionListener{
         @Override
         public void actionPerformed(ActionEvent e) {
-            if (!userAuthenticated && acIDbuffer == 0) {
-                acIDbuffer = intBuffer;
-            }
-            if (!userAuthenticated && pwdBuffer == 0 ) {
-                pwdBuffer = intBuffer;
-            }
-            if (!userAuthenticated && acIDbuffer != 0 && pwdBuffer != 0) {
-                authenticateUser();
-            }
+            
+            passToBE();// pass data from buffer to backend
             cancel();
         }
     }
@@ -127,10 +131,26 @@ public class ATM extends JFrame {
         setSize(820, 420);
         setVisible(true);
         setDefaultCloseOperation(EXIT_ON_CLOSE);
-        screenPanel.displayWindowsMessage( "\nWelcome.");
-        screenPanel.displayDialogMessage( "\nPlease enter your account number: " );
     }
 
+    public void passToBE() {
+        if (!userAuthenticated) {
+            if (acIDbuffer == 0) {
+                acIDbuffer = intBuffer;
+                cancel();
+            }
+            if (acIDbuffer != 0 && pwdBuffer ==0) {
+                screenPanel.displayWindowsMessage( "\nEnter your PIN: \n" ); // prompt for PIN
+                pwdBuffer = intBuffer;
+                cancel();
+            }
+            if (acIDbuffer != 0 && pwdBuffer != 0) {
+                authenticateUser();
+            }
+        }else{
+            performTransactions();
+        }
+    }
     public void performTransactions() {
 
         // Transaction currentTransaction = null;
@@ -143,13 +163,14 @@ public class ATM extends JFrame {
 
         //int swapSelection ;
 
-        while (!userExited) {
+        if(!userExited) {
             int mainMenuSelection = displayMainMenu();
 
             switch (mainMenuSelection) {
                 case SWAPTOCHEQUING:
                     if (swap == null) {
                         swap = bankDatabase.swapToChequing(currentAccountNumber);
+                        cancel();
                         performTransactions();
                         break;
                     }
@@ -157,6 +178,7 @@ public class ATM extends JFrame {
                 case SWAPTOSAVING:
                     if(swap == null){
                         swap = bankDatabase.swapToSaving(currentAccountNumber);
+                        cancel();
                         performTransactions();
                         break;
                     }
@@ -164,6 +186,7 @@ public class ATM extends JFrame {
                 case NOSWAPPING:
                     if(swap == null){
                         userExited = true;
+                        cancel();
                         break;
                     }
                 default:
@@ -171,6 +194,7 @@ public class ATM extends JFrame {
                     if (swap != null) {
                         type = bankDatabase.getAccountTypeString(swap.getAccountNumber());
                     }
+                    cancel();
                     userExited = transactionsControl(mainMenuSelection, type);
             }
             mainMenuSelection = 0;
@@ -229,11 +253,11 @@ public class ATM extends JFrame {
                     break;
                 case WITHDRAWAL: // create new Withdrawal transaction
                     temp = new Withdrawal( swap, screenPanel, 
-                    bankDatabase, null, cashDispenser );
+                    bankDatabase, testKeypad, cashDispenser );
                     break; 
                 case TRANSFER: // create new Transfer transaction
                     temp = new Transfer( swap, screenPanel, 
-                    bankDatabase, null);
+                    bankDatabase, testKeypad);
                     break;
                 case EXIT:
                         break;
@@ -247,11 +271,11 @@ public class ATM extends JFrame {
                     break;
                 case WITHDRAWAL: // create new Withdrawal transaction
                     temp = new Withdrawal( currentAccountNumber, screenPanel, 
-                    bankDatabase, null, cashDispenser );
+                    bankDatabase, testKeypad, cashDispenser );
                     break; 
                 case TRANSFER: // create new Transfer transaction
                     temp = new Transfer( currentAccountNumber, screenPanel  , 
-                    bankDatabase, null);
+                    bankDatabase, testKeypad);
                     break;
                 case EXIT:
                         break;
@@ -309,7 +333,6 @@ public class ATM extends JFrame {
             accountNumber = acIDbuffer;
         }
         if (accountNumber > 0) {
-            screenPanel.displayWindowsMessage( "\nEnter your PIN: \n" ); // prompt for PIN
             pin = pwdBuffer; // set userAuthenticated to boolean value returned by database
         }
         userAuthenticated = 
@@ -322,10 +345,13 @@ public class ATM extends JFrame {
             if (bankDatabase.getAccountTypeString(currentAccountNumber)==this.BOTHTYPE) {
                 bankDatabase.passBalance(currentAccountNumber);
             }
+            screenPanel.displayDialogMessage("\n Login successful.");
         } // end if
         else{
             screenPanel.displayWindowsMessage( 
                 "Invalid account number or PIN. Please try again." );
+            acIDbuffer = 0;
+            pwdBuffer = 0;
         }    
         System.out.println(accountNumber);
         System.out.println(pin);
@@ -335,6 +361,7 @@ public class ATM extends JFrame {
         sBuffer = "";
 		intBuffer = 0;
 		douBuffer = 0;
+        screenPanel.ipField.setText(null);
     }
 
     public void disableDot(boolean b) {
