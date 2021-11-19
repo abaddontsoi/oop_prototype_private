@@ -2,16 +2,16 @@ import javax.swing.*;
 import java.awt.event.ActionListener;
 import java.awt.event.ActionEvent;
 
-public class raw_login extends JFrame{
+public class LoginPanel extends JPanel{
     private JButton blogin;
     private JPanel loginpanel;
     private JTextField txuser;
     private JTextField pass;
     private JLabel username;
     private JLabel password;
-    
-    public raw_login(){
-        super("Login Authentification");
+    private Screen screen = new Screen();
+
+    public LoginPanel() {
 
         blogin = new JButton("Login");
         loginpanel = new JPanel();
@@ -24,6 +24,7 @@ public class raw_login extends JFrame{
         setLocation(500,280);
         loginpanel.setLayout(null); 
 
+        add(screen);
 
         txuser.setBounds(70,30,150,20);
         pass.setBounds(70,65,150,20);
@@ -37,12 +38,7 @@ public class raw_login extends JFrame{
         loginpanel.add(username);
         loginpanel.add(password);
 
-        getContentPane().add(loginpanel);
-        setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         setVisible(true);
+    }
 
-    }
-    public static void main(String[] args) {
-        raw_login atm = new raw_login();
-    }
 }
