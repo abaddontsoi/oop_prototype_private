@@ -9,7 +9,7 @@ public class LoginPanel extends JPanel{
     private JTextField pass;
     private JLabel username;
     private JLabel password;
-    private Screen screen = new Screen();
+    // private Screen screen = new Screen();
 
     public LoginPanel() {
 
@@ -24,7 +24,7 @@ public class LoginPanel extends JPanel{
         setLocation(500,280);
         loginpanel.setLayout(null); 
 
-        add(screen);
+        // add(screen);
 
         txuser.setBounds(70,30,150,20);
         pass.setBounds(70,65,150,20);
