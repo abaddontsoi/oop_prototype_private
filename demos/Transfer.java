@@ -1,13 +1,12 @@
 public class Transfer extends Transaction {
 
     private double amount; // amount to transfer
-    private Keypad keypad; // reference to keypad
 
     // the target account of fund transfer
     private int target;
 
     private BankDatabase bankDatabase; 
-    private Screen screen;
+    private screenWithButtons screen;
 
  
     // constant corresponding to menu option to cancel
@@ -15,20 +14,21 @@ public class Transfer extends Transaction {
  
     // Transfer constructor
     public Transfer( int userAccountNumber, screenWithButtons atmScreen, 
-    BankDatabase atmBankDatabase, Keypad atmKeypad){
+    BankDatabase atmBankDatabase, Double amount, int target){
 
         super(userAccountNumber, atmScreen, atmBankDatabase);
-
-        // initialize references to keypad
-        keypad = atmKeypad;
+        this.amount = amount;
+        this.target = target;
+        this.screen = atmScreen;
     }
-    //end Transfer constructor
+    
     public Transfer( Account userAccount, screenWithButtons atmScreen, 
-    BankDatabase atmBankDatabase, Keypad atmKeypad )
+    BankDatabase atmBankDatabase, double amount, int target )
     {
         super( userAccount, atmScreen, atmBankDatabase );
-
-        keypad = atmKeypad;
+        this.amount = amount;
+        this.target = target;
+        this.screen = atmScreen;
     }
  
 
@@ -37,64 +37,40 @@ public class Transfer extends Transaction {
     }
 
     // transfer method for non-compounded account
-    private void transferNormal(double availableBalance, int accountNumber, Screen screen,Keypad keypad) {
-        //this.keypad = keypad; 
-        
-        screen.displayMessage("Please enter target bank account number: ");
-        target = keypad.getInput();
+    private void transferNormal(double availableBalance, int accountNumber, int target) {
+        screen.jTextArea1.setText("\nPlease enter target bank account number: ");
 
-        screen.displayMessage("Please enter amount: ");
-        try {
-            amount = keypad.getDoubleInput();
+        if (isSufficientTransfer(amount, availableBalance) && bankDatabase.accountExists(target) 
+        && target != accountNumber && amount > 0 )
+        {
+            bankDatabase.debit(accountNumber, amount);
+            bankDatabase.credit(target, amount);
 
-            if (isSufficientTransfer(amount, availableBalance) && bankDatabase.accountExists(target) 
-            && target != accountNumber && amount > 0 ) {
-                bankDatabase.debit(accountNumber, amount);
-                bankDatabase.credit(target, amount);
-
-                screen.displayWindowsMessage("Successful.");
-            }else{
-                screen.displayWindowsMessage("Availavle balance is lower than transfer amount or target account unavailable.");
-                screen.displayWindowsMessage("Progress aborted."); 
-            }
-
-        } catch (Exception e) {
-
-            // to maintain all inputs are integer, fund with cents are not considered
-            screen.displayWindowsMessage("Input mismatch! In normal mode.");
-            amount = 0;
+            screen.jTextArea1.setText("Successful");
+        }else{
+            screen.jTextArea1.setText(
+                "\nAvailavle balance is lower than transfer amount \nor target account unavailable."+
+                "\nProgress aborted."
+            ); 
         }
     }
  
-    private void transferCompound(double availableBalance, Account subAccount, Screen screen, Keypad keypad){
+    private void transferCompound(double availableBalance, Account subAccount, int target){
         int acNum = subAccount.getAccountNumber();
 
-        // this.keypad = keypad; 
-        screen.displayMessage("Please enter target bank account number: ");
-        target = keypad.getInput();
+        if (isSufficientTransfer(amount, availableBalance) && bankDatabase.accountExists(target) 
+            && target != acNum && amount > 0) {
 
-        screen.displayMessage("Please enter amount: ");
-        try {
-            amount = keypad.getDoubleInput();
+            bankDatabase.debit(subAccount, amount);
+            bankDatabase.credit(target, amount);
 
-            if (isSufficientTransfer(amount, availableBalance) && bankDatabase.accountExists(target) 
-                && target != acNum && amount > 0) {
-
-                bankDatabase.debit(subAccount, amount);
-                bankDatabase.credit(target, amount);
-
-                screen.displayWindowsMessage("Successful.");
-            }else{
-                screen.displayWindowsMessage("Availavle balance is lower than transfer amount or target account unavailable.");
-                screen.displayWindowsMessage("Progress aborted."); 
-            }
-
-        } catch (Exception e) {
-
-            screen.displayWindowsMessage("Input mismatch! In compoud mode.");
-            amount = 0;
+            screen.jTextArea1.setText("Successful");
+        }else{
+            screen.jTextArea1.setText(
+                "\nAvailavle balance is lower than transfer amount or target account unavailable."+
+                "\nProgress aborted."
+            );     
         }
-
     }
     // perform transaction
     public void execute()
@@ -110,12 +86,10 @@ public class Transfer extends Transaction {
             bankDatabase.getAvailableBalance( getAccountNumber() );
  
 
-        //transferCompound(availableBalance, subAccount, screen, keypad);
-
         if(flag){
-            transferCompound(availableBalance, subAccount, screen, keypad);
+            transferCompound(availableBalance, subAccount, target);
         }else{
-            transferNormal(availableBalance, currentAccountNumber, screen, keypad);
+            transferNormal(availableBalance, currentAccountNumber,target);
         }
 
         

@@ -21,7 +21,7 @@ public class BalanceInquiry extends Transaction
    {
       // get references to bank database and screen
       BankDatabase bankDatabase = getBankDatabase();
-      Screen screen = null;
+      screenWithButtons screen = super.screen;
       double availableBalance,totalBalance;
       //double totalBalance;
 
@@ -44,14 +44,17 @@ public class BalanceInquiry extends Transaction
          totalBalance = 
             bankDatabase.getTotalBalance( getAccountNumber() );
       }
-      // display the balance information on the screen
-      screen.displayWindowsMessage( "\nBalance Information:" );
-      screen.displayMessage( " - Available balance: " ); 
-      screen.displayDollarAmount( availableBalance );
-      screen.displayMessage( "\n - Total balance:     " );
-      screen.displayDollarAmount( totalBalance );
-      screen.displayWindowsMessage( "" );
+      screen.jTextArea1.setText(
+         "\nBalance Information:"+
+         "\n - Available balance: "+
+         screen.displayMoney(availableBalance)+
+         "\n - Total balance:     "+
+         screen.displayMoney(totalBalance)+
+         ""
+      );
+
    } // end method execute
+
 } // end class BalanceInquiry
 
 

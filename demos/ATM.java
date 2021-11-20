@@ -32,34 +32,23 @@ public class ATM extends JFrame {
 
     private boolean userAuthenticated =false; // whether user is authenticated
     private int currentAccountNumber; // current user's account number
-    private CashDispenser cashDispenser; // ATM's cash dispenser
-    //private DepositSlot depositSlot; // ATM's deposit slot
+    private CashDispenser cashDispenser = new CashDispenser(); // ATM's cash dispenser
     private BankDatabase bankDatabase = new BankDatabase(); // account information database
 
-    // constants corresponding to main menu options
-    private static final int BALANCE_INQUIRY = 1;
-    private static final int WITHDRAWAL = 2;
-    // private static final int DEPOSIT = 3;
-    
-    // added new main menu option
-    private static final int TRANSFER = 3;
-
-    // for exit
-    private static final int EXIT = 0;
-
     // action listeners 
-    private CB cb = new CB(); // check balance
-    private WD wd = new WD(); // withdraw
-    private TS ts = new TS(); // transfer
-    private SWS sws = new SWS(); // swap to saving (for compound account)
-    private SWC swc = new SWC(); // swap to chequing (for compound account)
-
+    private bt01hlr _01hlr = new bt01hlr();
+    private bt11hlr _11hlr = new bt11hlr();
+    private bt21hlr _21hlr = new bt21hlr();
+    private bt00hlr _00hlr = new bt00hlr();
+    private bt10hlr _10hlr = new bt10hlr();
+    private bt20hlr _20hlr = new bt20hlr();
+    private bt30hlr _30hlr = new bt30hlr();
+    private normalKeypadNumericLiseter KPhlr = new normalKeypadNumericLiseter();
+    private normalKeypadOKListener OKhlr = new normalKeypadOKListener();
+    private normalKeypadResetListener Resethlr = new normalKeypadResetListener();
 
     // for swaping
     private Account swap = null;
-    private static final int SWAPTOSAVING = 8;
-    private static final int SWAPTOCHEQUING = 9;
-    private static final int NOSWAPPING = 0;
     private String type;
 
     // used as switch option
@@ -72,6 +61,14 @@ public class ATM extends JFrame {
 
     private JTextField acID = new JTextField();
     private JPasswordField pwd = new JPasswordField();
+
+    //for keypad opperation
+    private boolean WDwaitingInput = false;
+    private boolean TSwaitingInput = false;
+    private boolean TSTargetWaitingInput = false;
+    public String sbuffer = "";
+    public int target;
+    public boolean transferPerformed = false;
 
     public ATM() {
         initComponents();
@@ -161,6 +158,16 @@ public class ATM extends JFrame {
         loginAndOut2.jButton1.addActionListener(new loginHLR());
         loginAndOut2.jButton2.addActionListener(new logoutHLR());
 
+        for (int i = 0; i < inputButtonGP.length; i++) {
+            if(i == 12){
+                inputButtonGP[i].addActionListener(OKhlr);
+            }
+            if(i == 13){
+                inputButtonGP[i].addActionListener(Resethlr);
+            }
+            inputButtonGP[i].addActionListener(KPhlr);
+        }
+
         pack();
     }
     public static void main(String args[]) {
@@ -170,7 +177,7 @@ public class ATM extends JFrame {
         atm.setSize(1400, 500);
     }
 
-    private void init(boolean b) {
+    public void init(boolean b) {
         clean();
         if (!userAuthenticated) {
             screenWithButtons1.turnOn(!b);
@@ -180,9 +187,7 @@ public class ATM extends JFrame {
             inputField.setVisible(!b);
             pwd.setVisible(b);
             acID.setVisible(b);
-            for (int i = 0; i < inputButtonGP.length; i++) {
-                inputButtonGP[i].setEnabled(!b);
-            }
+            disableKeypad(b);
             screenWithButtons1.displayWelcome();
         }else{
             screenWithButtons1.turnOn(b);
@@ -192,12 +197,17 @@ public class ATM extends JFrame {
             inputField.setVisible(b);
             pwd.setVisible(!b);
             acID.setVisible(!b);
-            for (int i = 0; i < inputButtonGP.length; i++) {
-                inputButtonGP[i].setEnabled(b);
-            }
+            disableKeypad(!b);
         }
     }
 
+    private void disableKeypad(boolean b) {
+        for (int i = 0; i < inputButtonGP.length; i++) {
+            inputButtonGP[i].setEnabled(!b);
+        }
+    }
+
+    // reset buffers and input fields/areas
     private void clean() {
         acID.setText("");
         pwd.setText("");
@@ -207,6 +217,7 @@ public class ATM extends JFrame {
         screenWithButtons1.jTextArea1.setText("");
     }
 
+    //action listener of login button
     private class loginHLR implements ActionListener{
         @Override
         public void actionPerformed(ActionEvent e) {
@@ -215,6 +226,8 @@ public class ATM extends JFrame {
         }
     }
     
+    // action listener of logout button
+    // logout sequence will be activated after clicking action
     private class logoutHLR implements ActionListener {
         @Override
         public void actionPerformed(ActionEvent e) {
@@ -223,6 +236,7 @@ public class ATM extends JFrame {
         }
     }
 
+    // pass to backend
     private void passToBE() {
         if (validateData(pwd.getPassword(), acID.getText())) {
             accountNumber = Integer.valueOf(acID.getText());
@@ -237,6 +251,8 @@ public class ATM extends JFrame {
         }
     }
 
+    // validate inputs of login credential
+    // no "." and blank inpur are allowed
     private boolean validateData(char pwdTemp[], String IDtemp) {
         for (char c : pwdTemp) {
             if (c == '.'|| pwdTemp.length == 0) {
@@ -251,6 +267,7 @@ public class ATM extends JFrame {
         return true;
     }
 
+    // to log out
     public void logout() {
         accountNumber = 0;
         pin = 0;
@@ -259,6 +276,7 @@ public class ATM extends JFrame {
         this.init(true);
     }
 
+    // authenticate login credential
     private void authenticateUser() 
     {
         // bankDatabase
@@ -282,6 +300,7 @@ public class ATM extends JFrame {
         }
     } // end method authenticateUser
 
+    // switch on the screen and connected buttons 
     private void turnOnScreenBT() {
         type = (swap instanceof SavingAccount) ? SAVINGTYPE : (swap instanceof ChequeAccount)? CHEQUEINGTYPE: 
         bankDatabase.getAccountTypeString(currentAccountNumber);
@@ -290,83 +309,448 @@ public class ATM extends JFrame {
         swap = (swap instanceof SavingAccount)? swap = (SavingAccount) swap : (swap instanceof ChequeAccount)?
             swap = (ChequeAccount) swap : swap;
 
+        // System.out.println(type);
         switch (type) {
             case SAVINGTYPE:
             case CHEQUEINGTYPE:
                 screenWithButtons1.Bt01.setText("Check Balance");
-                screenWithButtons1.Bt01.removeActionListener(cb);
-                screenWithButtons1.Bt01.addActionListener(cb);
+                screenWithButtons1.Bt01.setActionCommand(screenWithButtons1.Bt01.getText());
+                screenWithButtons1.Bt01.removeActionListener(_01hlr);
+                screenWithButtons1.Bt01.addActionListener(_01hlr);
 
                 screenWithButtons1.Bt11.setText("Withdraw");
-                screenWithButtons1.Bt11.removeActionListener(wd);
-                screenWithButtons1.Bt11.addActionListener(wd);
+                screenWithButtons1.Bt11.setActionCommand(screenWithButtons1.Bt11.getText());
+                screenWithButtons1.Bt11.removeActionListener(_11hlr);
+                screenWithButtons1.Bt11.addActionListener(_11hlr);
 
                 screenWithButtons1.Bt21.setText("Transfer");
-                screenWithButtons1.Bt21.removeActionListener(ts);
-                screenWithButtons1.Bt21.addActionListener(ts);
+                screenWithButtons1.Bt21.setActionCommand(screenWithButtons1.Bt21.getText());
+                screenWithButtons1.Bt21.removeActionListener(_21hlr);
+                screenWithButtons1.Bt21.addActionListener(_21hlr);
                 break;
+
             case BOTHTYPE:
                 screenWithButtons1.Bt01.setText("Swap saving");
-                screenWithButtons1.Bt01.removeActionListener(sws);
-                screenWithButtons1.Bt01.addActionListener(sws);
+                screenWithButtons1.Bt01.setActionCommand("Swap saving");
+                screenWithButtons1.Bt01.removeActionListener(_01hlr);
+                screenWithButtons1.Bt01.addActionListener(_01hlr);
 
                 screenWithButtons1.Bt11.setText("Swap chequing");
-                screenWithButtons1.Bt11.removeActionListener(swc);
-                screenWithButtons1.Bt11.addActionListener(swc);
+                screenWithButtons1.Bt11.setActionCommand("Swap chequing");
+                screenWithButtons1.Bt11.removeActionListener(_11hlr);
+                screenWithButtons1.Bt11.addActionListener(_11hlr);
                 break;
         }
-
-
-        // showing which type of current account
-        // screen.displayWindowsMessage("\nYour current account type is: " + type);
     }
-    private class CB implements ActionListener {
+    
+    // action listener of button in row 0, col 1
+    private class bt01hlr implements ActionListener {
         @Override
         public void actionPerformed(ActionEvent e) {
             // TODO Auto-generated method stub
             Transaction temp = null;
-            if (swap != null) {
-                temp = new BalanceInquiry( 
-                        swap,screenWithButtons1, bankDatabase );
-                System.out.print("has swap.\n");
-            }else{
-                temp = new BalanceInquiry( 
-                        currentAccountNumber,screenWithButtons1, bankDatabase );
-                System.out.print("no swap.\n");
+            String btCommand = screenWithButtons1.Bt01.getActionCommand();
+            int amount = 1000;
+            // System.out.println(btCommand);
+            switch (btCommand) {
+                case "Confirm":
+                    // amount = Integer.valueOf(btCommand);
+                    if (swap != null) {
+                        temp = new Withdrawal(swap, screenWithButtons1, bankDatabase, cashDispenser, amount); 
+                    }else{
+                        temp = new Withdrawal(accountNumber, screenWithButtons1, bankDatabase, cashDispenser, amount); 
+                    }
+                    temp.execute();
+                    resetAllScreenBT();
+                    turnOnScreenBT();
+                    // logout();
+                    break;
+                case "1000":
+                    screenWithButtons1.jTextArea1.setText("Confirm?");
+                    screenWithButtons1.Bt01.setText("Confirm");
+                    screenWithButtons1.Bt01.setActionCommand("Confirm");
+                    setOtherScreenBTDisable(screenWithButtons1.Bt01, true);
+                    break;
+                case "Check Balance":
+                    temp = null;
+                    if (swap != null) {
+                        temp = new BalanceInquiry( 
+                                swap,screenWithButtons1, bankDatabase );
+                        System.out.print("has swap.\n");
+                        temp.execute();
+                    }else{
+                        temp = new BalanceInquiry( 
+                                currentAccountNumber,screenWithButtons1, bankDatabase );
+                        System.out.print("no swap.\n");
+                        temp.execute();
+                    }
+                    break;
+                case "Swap saving":
+                    swap = bankDatabase.swapToSaving(currentAccountNumber);
+                    turnOnScreenBT();    
+                    break;           
             }
         }
     }
-    private class WD implements ActionListener {
-        @Override
-        public void actionPerformed(ActionEvent e) {
-            // TODO Auto-generated method stub
-            
-        }        
-    }
-    private class TS implements ActionListener {
+    
+    // action listener of button in row 0, col 0
+    private class bt00hlr implements ActionListener{
 
         @Override
         public void actionPerformed(ActionEvent e) {
             // TODO Auto-generated method stub
-            
+            Transaction temp = null;
+            String btCommand = screenWithButtons1.Bt00.getActionCommand();
+            int amount = 200;
+            // System.out.println(btCommand);
+            switch (btCommand) {
+                case "Confirm":
+                    // amount = Integer.valueOf(btCommand);
+                    if (swap != null) {
+                        temp = new Withdrawal(swap, screenWithButtons1, bankDatabase, cashDispenser, amount); 
+                    }else{
+                        temp = new Withdrawal(accountNumber, screenWithButtons1, bankDatabase, cashDispenser, amount); 
+                    }
+                    temp.execute();
+                    resetAllScreenBT();
+                    turnOnScreenBT();
+                    // logout();
+                    break;
+                case "200":
+                    screenWithButtons1.jTextArea1.setText("Confirm?");
+                    screenWithButtons1.Bt00.setText("Confirm");
+                    screenWithButtons1.Bt00.setActionCommand("Confirm");
+                    setOtherScreenBTDisable(screenWithButtons1.Bt00, true);
+                    break;
+            }
+        }
+    }
+    
+    // action listener of button in row 1, col 0 
+    private class bt10hlr implements ActionListener {
+        @Override
+        public void actionPerformed(ActionEvent e) {
+            // TODO Auto-generated method stub
+            Transaction temp = null;
+            String btCommand = screenWithButtons1.Bt10.getActionCommand();
+            int amount = 400;
+            // System.out.println(btCommand);
+            switch (btCommand) {
+                case "Confirm":
+                    // amount = Integer.valueOf(btCommand);
+                    if (swap != null) {
+                        temp = new Withdrawal(swap, screenWithButtons1, bankDatabase, cashDispenser, amount); 
+                    }else{
+                        temp = new Withdrawal(accountNumber, screenWithButtons1, bankDatabase, cashDispenser, amount); 
+                    }
+                    temp.execute();
+                    resetAllScreenBT();
+                    turnOnScreenBT();
+                    // logout();
+                    break;
+                case "400":
+                    screenWithButtons1.jTextArea1.setText("Confirm?");
+                    screenWithButtons1.Bt10.setText("Confirm");
+                    screenWithButtons1.Bt10.setActionCommand("Confirm");
+                    setOtherScreenBTDisable(screenWithButtons1.Bt10, true);
+                    break;
+            }
         }        
     }
-    private class SWS implements ActionListener {
+
+    // action listener of button in row 2, col 0 
+    private class bt20hlr implements ActionListener {
+        @Override
+        public void actionPerformed(ActionEvent e) {
+            // TODO Auto-generated method stub
+            Transaction temp = null;
+            String btCommand = screenWithButtons1.Bt20.getActionCommand();
+            int amount = 600;
+            // System.out.println(btCommand);
+            switch (btCommand) {
+                case "Confirm":
+                    // amount = Integer.valueOf(btCommand);
+                    if (swap != null) {
+                        temp = new Withdrawal(swap, screenWithButtons1, bankDatabase, cashDispenser, amount); 
+                    }else{
+                        temp = new Withdrawal(accountNumber, screenWithButtons1, bankDatabase, cashDispenser, amount); 
+                    }
+                    temp.execute();
+                    resetAllScreenBT();
+                    turnOnScreenBT();
+                    // logout();
+                    break;
+                case "600":
+                    screenWithButtons1.jTextArea1.setText("Confirm?");
+                    screenWithButtons1.Bt20.setText("Confirm");
+                    screenWithButtons1.Bt20.setActionCommand("Confirm");
+                    setOtherScreenBTDisable(screenWithButtons1.Bt20, true);
+                    break;
+            }
+
+        }        
+    }
+
+    // action listener of button in row 3, col 0 
+    private class bt30hlr implements ActionListener {
+        @Override
+        public void actionPerformed(ActionEvent e) {
+            // TODO Auto-generated method stub
+            Transaction temp = null;
+            String btCommand = screenWithButtons1.Bt30.getActionCommand();
+            int amount = 800;
+            // System.out.println(btCommand);
+            switch (btCommand) {
+                case "Confirm":
+                    // amount = Integer.valueOf(btCommand);
+                    if (swap != null) {
+                        temp = new Withdrawal(swap, screenWithButtons1, bankDatabase, cashDispenser, amount); 
+                    }else{
+                        temp = new Withdrawal(accountNumber, screenWithButtons1, bankDatabase, cashDispenser, amount); 
+                    }
+                    temp.execute();
+                    resetAllScreenBT();
+                    turnOnScreenBT();
+                    // logout();
+                    break;
+                case "800":
+                    screenWithButtons1.jTextArea1.setText("Confirm?");
+                    screenWithButtons1.Bt30.setText("Confirm");
+                    screenWithButtons1.Bt30.setActionCommand("Confirm");
+                    setOtherScreenBTDisable(screenWithButtons1.Bt30, true);
+                    break;
+            }
+
+        }        
+    }
+
+    // action listener of button in row 1, col 1
+    private class bt11hlr implements ActionListener {
 
         @Override
         public void actionPerformed(ActionEvent e) {
             // TODO Auto-generated method stub
-            swap = bankDatabase.swapToSaving(currentAccountNumber);
-            turnOnScreenBT();
+            String btCommand = screenWithButtons1.Bt11.getActionCommand();
+            switch (btCommand) {
+                case "Withdraw":
+                
+                    screenWithButtons1.jTextArea1.setText("");
+        
+                    screenWithButtons1.Bt00.setText("200");
+                    screenWithButtons1.Bt10.setText("400");
+                    screenWithButtons1.Bt20.setText("600");
+                    screenWithButtons1.Bt30.setText("800");
+                    screenWithButtons1.Bt01.setText("1000");
+                    screenWithButtons1.Bt11.setText("Custom amount");
+                    screenWithButtons1.Bt21.setText("Back");
+                    // System.out.println(btCommand);
+
+                    screenWithButtons1.Bt00.setActionCommand("200");
+                    screenWithButtons1.Bt00.removeActionListener(_00hlr);
+                    screenWithButtons1.Bt00.addActionListener(_00hlr);
+
+                    screenWithButtons1.Bt10.setActionCommand("400");
+                    screenWithButtons1.Bt10.removeActionListener(_10hlr);
+                    screenWithButtons1.Bt10.addActionListener(_10hlr);
+
+                    screenWithButtons1.Bt20.setActionCommand("600");
+                    screenWithButtons1.Bt20.removeActionListener(_20hlr);
+                    screenWithButtons1.Bt20.addActionListener(_20hlr);
+
+                    screenWithButtons1.Bt30.setActionCommand("800");
+                    screenWithButtons1.Bt30.removeActionListener(_30hlr);
+                    screenWithButtons1.Bt30.addActionListener(_30hlr);
+
+                    screenWithButtons1.Bt01.setActionCommand("1000");
+                    screenWithButtons1.Bt11.setActionCommand("Custom amount");
+                    screenWithButtons1.Bt21.setActionCommand("Back");
+
+                    break;
+                case "Swap chequing":
+                    System.out.println(btCommand);
+                    swap = bankDatabase.swapToChequing(currentAccountNumber);
+                    turnOnScreenBT();    
+                    break;           
+                case "Custom amount":
+                    screenWithButtons1.jTextArea1.setText("\nPlease enter amount");
+                    WDwaitingInput = true;
+                    TSwaitingInput = false;
+                    TSTargetWaitingInput = false;
+                    setOtherScreenBTDisable(inputButtonGP[12], true);
+                    break;
+            }
         }
     }
-    private class SWC implements ActionListener {
+
+    // button listener for Transfer method
+    private class bt21hlr implements ActionListener {
+
         @Override
         public void actionPerformed(ActionEvent e) {
             // TODO Auto-generated method stub
-            swap = bankDatabase.swapToChequing(currentAccountNumber);
-            turnOnScreenBT();
+            String btCommand = screenWithButtons1.Bt21.getActionCommand();
+            switch (btCommand) {
+                case "Transfer":
+                    TSTargetWaitingInput = true;
+                    setOtherScreenBTDisable(screenWithButtons1.Bt21, true);
+                    screenWithButtons1.jTextArea1.setText("\nPlease enter target bank account number: ");
+                    screenWithButtons1.Bt21.setText("Back");
+                    screenWithButtons1.Bt21.setActionCommand("Back");
+                    TSwaitingInput = false;
+                    WDwaitingInput = false;
+                    break;
+                case "Back":
+                    screenWithButtons1.jTextArea1.setText(
+                        "Backed."+
+                        "\nReady for other opperation."
+                        );
+                    TSwaitingInput = false;
+                    WDwaitingInput = false;
+                    resetAllScreenBT();
+                    turnOnScreenBT();
+                break;
+            }
         }
+    }
+    
+    // button listeners for keypad
+    private class normalKeypadNumericLiseter implements ActionListener {
+
+        @Override
+        public void actionPerformed(ActionEvent e) {
+            // TODO Auto-generated method stub
+            JButton src = (JButton)e.getSource();
+            String btCommand = src.getActionCommand();
+            if (btCommand!="OK" && btCommand != "Reset") {
+                inputField.setText(inputField.getText() + btCommand);
+            }
+            sbuffer = inputField.getText();
+            System.out.println(btCommand);
+        }
+    }
+
+    private class normalKeypadOKListener implements ActionListener {
+
+        @Override
+        public void actionPerformed(ActionEvent e) {
+            // TODO Auto-generated method stub
+            Transaction temp = null;
+            if(validateData(sbuffer)){
+                if (TSTargetWaitingInput && !TSwaitingInput && !WDwaitingInput) {
+                    // validateData(sbuffer);
+                    target = Integer.valueOf(sbuffer);
+                    TSTargetWaitingInput = !TSTargetWaitingInput;
+                    screenWithButtons1.jTextArea1.setText("\nPlz enter amount: ");
+                    // setOtherScreenBTDisable(screenWithButtons1.Bt21, true);
+                }
+                if (TSwaitingInput && !WDwaitingInput && !TSTargetWaitingInput) {
+                    if (swap != null) {
+                        temp = new Transfer(swap, screenWithButtons1, 
+                        bankDatabase, Double.valueOf(sbuffer), target);
+                        TSwaitingInput = false;
+                        temp.execute();
+                        transferPerformed = true;
+                        System.out.print(screenWithButtons1.jTextArea1.getText());
+                    }if (swap == null) {
+                        temp = new Transfer(currentAccountNumber, screenWithButtons1, 
+                        bankDatabase, Double.valueOf(sbuffer), target);
+                        TSwaitingInput = false;
+                        temp.execute();
+                        transferPerformed = true;
+                        System.out.print(screenWithButtons1.jTextArea1.getText());
+                    }
+                }
+                if (WDwaitingInput && !TSwaitingInput) {
+                    if (swap != null) {
+                        temp = new Withdrawal(swap, screenWithButtons1, 
+                        bankDatabase,cashDispenser,Integer.valueOf(sbuffer));
+                        temp.execute();
+                    }if (swap == null) {
+                        temp = new Withdrawal(currentAccountNumber, screenWithButtons1, 
+                        bankDatabase, cashDispenser, Integer.valueOf(sbuffer));
+                        temp.execute();
+                    }
+                }
+                if (!TSTargetWaitingInput && !WDwaitingInput && !transferPerformed) {
+                    TSwaitingInput = true;
+                    setOtherScreenBTDisable(screenWithButtons1.Bt21, true);
+                }
+                resetAllScreenBT();
+                turnOnScreenBT();
+                WDwaitingInput = false;
+                TSTargetWaitingInput = false;
+                inputField.setText("");
+            }else{
+                if (TSwaitingInput) {
+                    screenWithButtons1.jTextArea1.setText(
+                        "\nInvalid input, please enter again."+
+                        "\nOr click Back to abort."
+                        );
+                }
+            }
+
+            if (!TSTargetWaitingInput && !WDwaitingInput && !transferPerformed) {
+                setOtherScreenBTDisable(screenWithButtons1.Bt21, true);
+                screenWithButtons1.Bt21.setText("Back");
+                screenWithButtons1.Bt21.setActionCommand("Back");
+                inputField.setText("");
+            }
+        }
+    }
+
+    private class normalKeypadResetListener implements ActionListener {
+        @Override
+        public void actionPerformed(ActionEvent e) {
+            // TODO Auto-generated method stub
+            inputField.setText("");
+        }        
+    }
+
+    // disable all irrelevent screen button to avoid miss click
+    public void setOtherScreenBTDisable(JButton bt, boolean b) {
+        JButton[] screenBTArray = {
+            screenWithButtons1.Bt00,
+            screenWithButtons1.Bt01,
+            screenWithButtons1.Bt10,
+            screenWithButtons1.Bt11,
+            screenWithButtons1.Bt20,
+            //screenWithButtons1.Bt21,
+            screenWithButtons1.Bt31,
+            screenWithButtons1.Bt30
+        };
+        for (JButton jButton : screenBTArray) {
+            if (jButton != bt) {
+                jButton.setEnabled(!b);
+            }
+        }
+    }
+    
+    // validate input type
+    public boolean validateData(String inputString) {
+        if (inputString.startsWith(".")||inputString.isEmpty()) {
+            return false;
+        }else
+            return true;
+    }
+
+
+    // enable all screen button for further opperation
+    public void resetAllScreenBT() {
+        JButton[] screenBTArray = {
+            screenWithButtons1.Bt00,
+            screenWithButtons1.Bt01,
+            screenWithButtons1.Bt10,
+            screenWithButtons1.Bt11,
+            screenWithButtons1.Bt20,
+            screenWithButtons1.Bt21,
+            screenWithButtons1.Bt30,
+            screenWithButtons1.Bt31,
+        };
+        for (JButton jButton : screenBTArray) {
+            jButton.setEnabled(true);
+            jButton.setText("");
+        }
+
     }
 
 }

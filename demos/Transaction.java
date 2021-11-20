@@ -6,7 +6,7 @@
 public abstract class Transaction
 {
    private int accountNumber; // indicates account involved
-   private screenWithButtons screen; // ATM's screen
+   protected screenWithButtons screen; // ATM's screen
    private BankDatabase bankDatabase; // account info database
    private Account account = null;
 

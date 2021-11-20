@@ -4,9 +4,7 @@
  */
 
 import javax.swing.*;
-import java.awt.event.ActionListener;
 import java.awt.Font;
-import java.awt.event.ActionEvent;
 
 public class screenWithButtons extends JPanel {
 
@@ -49,35 +47,35 @@ public class screenWithButtons extends JPanel {
         add(jScrollPane1);
         jScrollPane1.setBounds(100, 10, 514, 323);
 
-        Bt21.setText("jButton3");
+        Bt21.setText("");
         add(Bt21);
         Bt21.setBounds(620, 170, 170, 76);
 
-        Bt01.setText("jButton1");
+        Bt01.setText("");
         add(Bt01);
         Bt01.setBounds(620, 10, 170, 72);
 
-        Bt31.setText("jButton4");
+        Bt31.setText("");
         add(Bt31);
         Bt31.setBounds(620, 250, 170, 84);
 
-        Bt00.setText("jButton5");
+        Bt00.setText("");
         add(Bt00);
         Bt00.setBounds(10, 10, 81, 76);
 
-        Bt10.setText("jButton6");
+        Bt10.setText("");
         add(Bt10);
         Bt10.setBounds(10, 90, 81, 76);
 
-        Bt11.setText("jButton2");
+        Bt11.setText("");
         add(Bt11);
         Bt11.setBounds(620, 90, 170, 76);
 
-        Bt30.setText("jButton8");
+        Bt30.setText("");
         add(Bt30);
         Bt30.setBounds(10, 250, 81, 80);
 
-        Bt20.setText("jButton7");
+        Bt20.setText("");
         add(Bt20);
         Bt20.setBounds(10, 170, 81, 76);
     }
@@ -103,5 +101,11 @@ public class screenWithButtons extends JPanel {
             "\nPlease login with the field on right."+
             "\nEnter your user ID on top and password in the bottom."
         );
+    }
+
+    public String displayMoney(double amount) {
+        String returnValue;
+        returnValue = "$" + amount;  
+        return returnValue;
     }
 }
