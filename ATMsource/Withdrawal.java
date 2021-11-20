@@ -75,7 +75,7 @@ public class Withdrawal extends Transaction
          if ( amount != CANCELED )
          {
             // check whether the user has enough money in the account 
-            if ( amount <= availableBalance )
+            if ( amount <= availableBalance && amount > 0 )
             {   
                // check whether the cash dispenser has enough money
                if ( cashDispenser.isSufficientCashAvailable( amount ) )
@@ -87,24 +87,24 @@ public class Withdrawal extends Transaction
                   disabled = true; // cash was dispensed
 
                   // instruct user to take cash
-                  screen.displayDialogMessage( 
+                  screen.displayWindowsMessage( 
                      "\nPlease take your cash now." );
                } // end if
                else // cash dispenser does not have enough cash
-                  screen.displayDialogMessage( 
+                  screen.displayWindowsMessage( 
                      "\nInsufficient cash available in the ATM." +
                      "\n\nPlease choose a smaller amount." );
             } // end if
             else // not enough money available in user's account
             {
-               screen.displayDialogMessage( 
+               screen.displayWindowsMessage( 
                   "\nInsufficient funds in your account." +
                   "\n\nPlease choose a smaller amount." );
             } // end else
          } // end if
          else // user chose cancel menu option 
          {
-            screen.displayDialogMessage( "\nCanceling transaction..." );
+            screen.displayWindowsMessage( "\nCanceling transaction..." );
             disabled = true; // return to main menu because user canceled
          } // end else
          return disabled;
@@ -119,7 +119,7 @@ public class Withdrawal extends Transaction
          if ( amount != CANCELED )
          {
             // check whether the user has enough money in the account 
-            if ( amount <= availableBalance )
+            if ( amount <= availableBalance && amount > 0)
             {   
                // check whether the cash dispenser has enough money
                if ( cashDispenser.isSufficientCashAvailable( amount ) )
@@ -131,24 +131,24 @@ public class Withdrawal extends Transaction
                   disabled = true; // cash was dispensed
 
                   // instruct user to take cash
-                  screen.displayDialogMessage( 
+                  screen.displayWindowsMessage( 
                      "\nPlease take your cash now." );
                } // end if
                else // cash dispenser does not have enough cash
-                  screen.displayDialogMessage( 
+                  screen.displayWindowsMessage( 
                      "\nInsufficient cash available in the ATM." +
                      "\n\nPlease choose a smaller amount." );
             } // end if
             else // not enough money available in user's account
             {
-               screen.displayDialogMessage( 
+               screen.displayWindowsMessage( 
                   "\nInsufficient funds in your account." +
                   "\n\nPlease choose a smaller amount." );
             } // end else
          } // end if
          else // user chose cancel menu option 
          {
-            screen.displayDialogMessage( "\nCanceling transaction..." );
+            screen.displayWindowsMessage( "\nCanceling transaction..." );
             disabled = true; // return to main menu because user canceled
          } // end else
       return disabled;
@@ -169,14 +169,14 @@ public class Withdrawal extends Transaction
       while ( userChoice == 0 )
       {
          // display the menu
-         screen.displayDialogMessage( "\nWithdrawal Menu:" );
-         screen.displayDialogMessage( "1 - $200" );
-         screen.displayDialogMessage( "2 - $400" );
-         screen.displayDialogMessage( "3 - $600" );
-         screen.displayDialogMessage( "4 - $800" );
-         screen.displayDialogMessage( "5 - $1000" );
-         screen.displayDialogMessage( "6 - Custom amount" );
-         screen.displayDialogMessage( "7 - Cancel transaction" );
+         screen.displayWindowsMessage( "\nWithdrawal Menu:" );
+         screen.displayWindowsMessage( "1 - $200" );
+         screen.displayWindowsMessage( "2 - $400" );
+         screen.displayWindowsMessage( "3 - $600" );
+         screen.displayWindowsMessage( "4 - $800" );
+         screen.displayWindowsMessage( "5 - $1000" );
+         screen.displayWindowsMessage( "6 - Custom amount" );
+         screen.displayWindowsMessage( "7 - Cancel transaction" );
          screen.displayMessage( "\nChoose a withdrawal amount: " );
 
          int input = keypad.getInput(); // get user input through keypad
@@ -193,7 +193,7 @@ public class Withdrawal extends Transaction
                break;
 
             case CUSTOMIZE: // get user input
-               screen.displayDialogMessage("Please enter withdrawl option: ");
+               screen.displayWindowsMessage("Please enter withdrawl option: ");
                int temp = keypad.getInput();
                if (checkIsMultiple(temp, screen)) {
                   userChoice = temp;
@@ -204,7 +204,7 @@ public class Withdrawal extends Transaction
                userChoice = CANCELED; // save user's choice
                break;
             default: // the user did not enter a value from 1-6
-               screen.displayDialogMessage( 
+               screen.displayWindowsMessage( 
                   "\nIvalid selection. Try again." );
          } // end switch
       } // end while
@@ -218,7 +218,7 @@ public class Withdrawal extends Transaction
       if (mod == 0) {
          return true;
       }else{
-         screen.displayDialogMessage("Input is not a multiple of $100, aborting...");
+         screen.displayWindowsMessage("Input is not a multiple of $100, aborting...");
          return false;   
       }
    }

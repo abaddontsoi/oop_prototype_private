@@ -47,20 +47,21 @@ public class Transfer extends Transaction {
         try {
             amount = keypad.getDoubleInput();
 
-            if (isSufficientTransfer(amount, availableBalance) && bankDatabase.accountExists(target) && target != accountNumber) {
+            if (isSufficientTransfer(amount, availableBalance) && bankDatabase.accountExists(target) 
+            && target != accountNumber && amount > 0 ) {
                 bankDatabase.debit(accountNumber, amount);
                 bankDatabase.credit(target, amount);
 
-                screen.displayDialogMessage("Successful.");
+                screen.displayWindowsMessage("Successful.");
             }else{
-                screen.displayDialogMessage("Availavle balance is lower than transfer amount or target account unavailable.");
-                screen.displayDialogMessage("Progress aborted."); 
+                screen.displayWindowsMessage("Availavle balance is lower than transfer amount or target account unavailable.");
+                screen.displayWindowsMessage("Progress aborted."); 
             }
 
         } catch (Exception e) {
 
             // to maintain all inputs are integer, fund with cents are not considered
-            screen.displayDialogMessage("Input mismatch! In normal mode.");
+            screen.displayWindowsMessage("Input mismatch! In normal mode.");
             amount = 0;
         }
     }
@@ -77,20 +78,20 @@ public class Transfer extends Transaction {
             amount = keypad.getDoubleInput();
 
             if (isSufficientTransfer(amount, availableBalance) && bankDatabase.accountExists(target) 
-                && target != acNum) {
+                && target != acNum && amount > 0) {
 
                 bankDatabase.debit(subAccount, amount);
                 bankDatabase.credit(target, amount);
 
-                screen.displayDialogMessage("Successful.");
+                screen.displayWindowsMessage("Successful.");
             }else{
-                screen.displayDialogMessage("Availavle balance is lower than transfer amount or target account unavailable.");
-                screen.displayDialogMessage("Progress aborted."); 
+                screen.displayWindowsMessage("Availavle balance is lower than transfer amount or target account unavailable.");
+                screen.displayWindowsMessage("Progress aborted."); 
             }
 
         } catch (Exception e) {
 
-            screen.displayDialogMessage("Input mismatch! In compoud mode.");
+            screen.displayWindowsMessage("Input mismatch! In compoud mode.");
             amount = 0;
         }
 
