@@ -4,13 +4,13 @@
 public class BalanceInquiry extends Transaction
 {
    // BalanceInquiry constructor
-   public BalanceInquiry( int userAccountNumber, Screen atmScreen, 
+   public BalanceInquiry( int userAccountNumber, screenWithButtons atmScreen, 
       BankDatabase atmBankDatabase )
    {
       super( userAccountNumber, atmScreen, atmBankDatabase );
    } // end BalanceInquiry constructor
 
-   public BalanceInquiry( Account userAccount, Screen atmScreen, 
+   public BalanceInquiry( Account userAccount, screenWithButtons atmScreen, 
       BankDatabase atmBankDatabase )
    {
       super( userAccount, atmScreen, atmBankDatabase );
@@ -21,7 +21,7 @@ public class BalanceInquiry extends Transaction
    {
       // get references to bank database and screen
       BankDatabase bankDatabase = getBankDatabase();
-      Screen screen = getScreen();
+      Screen screen = null;
       double availableBalance,totalBalance;
       //double totalBalance;
 

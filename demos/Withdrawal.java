@@ -14,7 +14,7 @@ public class Withdrawal extends Transaction
    private final static int CANCELED = 7;
 
    // Withdrawal constructor
-   public Withdrawal( int userAccountNumber, Screen atmScreen, 
+   public Withdrawal( int userAccountNumber, screenWithButtons atmScreen, 
       BankDatabase atmBankDatabase, Keypad atmKeypad, 
       CashDispenser atmCashDispenser )
    {
@@ -26,7 +26,7 @@ public class Withdrawal extends Transaction
       cashDispenser = atmCashDispenser;
    } // end Withdrawal constructor
 
-   public Withdrawal( Account userAccount, Screen atmScreen, 
+   public Withdrawal( Account userAccount, screenWithButtons atmScreen, 
    BankDatabase atmBankDatabase,Keypad atmKeypad, 
    CashDispenser atmCashDispenser )
    {
@@ -43,7 +43,7 @@ public class Withdrawal extends Transaction
 
       // get references to bank database and screen
       BankDatabase bankDatabase = getBankDatabase();
-      Screen screen = getScreen();
+      screenWithButtons screen = null;
 
       Account subAccount = super.getAccount();
 
@@ -65,7 +65,7 @@ public class Withdrawal extends Transaction
       // loop until cash is dispensed or the user cancels
    } // end method execute
 
-   private boolean normalWithdraw(double availableBalance, int currentAccountNumber, Screen screen,
+   private boolean normalWithdraw(double availableBalance, int currentAccountNumber, screenWithButtons screen,
        Keypad keypad_Keypad, BankDatabase database, boolean disabled) {
 
          // obtain a chosen withdrawal amount from the user 
@@ -87,30 +87,30 @@ public class Withdrawal extends Transaction
                   disabled = true; // cash was dispensed
 
                   // instruct user to take cash
-                  screen.displayWindowsMessage( 
-                     "\nPlease take your cash now." );
+                  // screen.displayWindowsMessage( 
+                  //    "\nPlease take your cash now." );
                } // end if
-               else // cash dispenser does not have enough cash
-                  screen.displayWindowsMessage( 
-                     "\nInsufficient cash available in the ATM." +
-                     "\n\nPlease choose a smaller amount." );
+               // else // cash dispenser does not have enough cash
+               //    screen.displayWindowsMessage( 
+               //       "\nInsufficient cash available in the ATM." +
+               //       "\n\nPlease choose a smaller amount." );
             } // end if
             else // not enough money available in user's account
             {
-               screen.displayWindowsMessage( 
-                  "\nInsufficient funds in your account." +
-                  "\n\nPlease choose a smaller amount." );
+               // screen.displayWindowsMessage( 
+               //    "\nInsufficient funds in your account." +
+               //    "\n\nPlease choose a smaller amount." );
             } // end else
          } // end if
          else // user chose cancel menu option 
          {
-            screen.displayWindowsMessage( "\nCanceling transaction..." );
+            // screen.displayWindowsMessage( "\nCanceling transaction..." );
             disabled = true; // return to main menu because user canceled
          } // end else
          return disabled;
    }
 
-   private boolean compoundWithdraw(double availableBalance, Account subAccount, Screen screen, Keypad keypad_Keypad, 
+   private boolean compoundWithdraw(double availableBalance, Account subAccount, screenWithButtons screen, Keypad keypad_Keypad, 
       BankDatabase database, boolean disabled) {
          // obtain a chosen withdrawal amount from the user 
          amount = displayMenuOfAmounts();
@@ -131,24 +131,24 @@ public class Withdrawal extends Transaction
                   disabled = true; // cash was dispensed
 
                   // instruct user to take cash
-                  screen.displayWindowsMessage( 
-                     "\nPlease take your cash now." );
+                  // screen.displayWindowsMessage( 
+                  //    "\nPlease take your cash now." );
                } // end if
-               else // cash dispenser does not have enough cash
-                  screen.displayWindowsMessage( 
-                     "\nInsufficient cash available in the ATM." +
-                     "\n\nPlease choose a smaller amount." );
+               // else // cash dispenser does not have enough cash
+               //    screen.displayWindowsMessage( 
+               //       "\nInsufficient cash available in the ATM." +
+               //       "\n\nPlease choose a smaller amount." );
             } // end if
             else // not enough money available in user's account
             {
-               screen.displayWindowsMessage( 
-                  "\nInsufficient funds in your account." +
-                  "\n\nPlease choose a smaller amount." );
+               // screen.displayWindowsMessage( 
+               //    "\nInsufficient funds in your account." +
+               //    "\n\nPlease choose a smaller amount." );
             } // end else
          } // end if
          else // user chose cancel menu option 
          {
-            screen.displayWindowsMessage( "\nCanceling transaction..." );
+            // screen.displayWindowsMessage( "\nCanceling transaction..." );
             disabled = true; // return to main menu because user canceled
          } // end else
       return disabled;
@@ -160,7 +160,7 @@ public class Withdrawal extends Transaction
    {
       int userChoice = 0; // local variable to store return value
 
-      Screen screen = getScreen(); // get screen reference
+      screenWithButtons screen = getScreen(); // get screen reference
       
       // array of amounts to correspond to menu numbers
       int amounts[] = { 0, 200, 400, 600, 800, 1000};
@@ -169,15 +169,15 @@ public class Withdrawal extends Transaction
       while ( userChoice == 0 )
       {
          // display the menu
-         screen.displayWindowsMessage( "\nWithdrawal Menu:" );
-         screen.displayWindowsMessage( "1 - $200" );
-         screen.displayWindowsMessage( "2 - $400" );
-         screen.displayWindowsMessage( "3 - $600" );
-         screen.displayWindowsMessage( "4 - $800" );
-         screen.displayWindowsMessage( "5 - $1000" );
-         screen.displayWindowsMessage( "6 - Custom amount" );
-         screen.displayWindowsMessage( "7 - Cancel transaction" );
-         screen.displayMessage( "\nChoose a withdrawal amount: " );
+         // screen.displayWindowsMessage( "\nWithdrawal Menu:" );
+         // screen.displayWindowsMessage( "1 - $200" );
+         // screen.displayWindowsMessage( "2 - $400" );
+         // screen.displayWindowsMessage( "3 - $600" );
+         // screen.displayWindowsMessage( "4 - $800" );
+         // screen.displayWindowsMessage( "5 - $1000" );
+         // screen.displayWindowsMessage( "6 - Custom amount" );
+         // screen.displayWindowsMessage( "7 - Cancel transaction" );
+         // screen.displayMessage( "\nChoose a withdrawal amount: " );
 
          int input = keypad.getInput(); // get user input through keypad
 
@@ -193,7 +193,7 @@ public class Withdrawal extends Transaction
                break;
 
             case CUSTOMIZE: // get user input
-               screen.displayWindowsMessage("Please enter withdrawl option: ");
+               // screen.displayWindowsMessage("Please enter withdrawl option: ");
                int temp = keypad.getInput();
                if (checkIsMultiple(temp, screen)) {
                   userChoice = temp;
@@ -204,8 +204,8 @@ public class Withdrawal extends Transaction
                userChoice = CANCELED; // save user's choice
                break;
             default: // the user did not enter a value from 1-6
-               screen.displayWindowsMessage( 
-                  "\nIvalid selection. Try again." );
+               // screen.displayWindowsMessage( 
+               //    "\nIvalid selection. Try again." );
          } // end switch
       } // end while
 
@@ -213,12 +213,12 @@ public class Withdrawal extends Transaction
    } // end method displayMenuOfAmounts
 
    // to check whether user's input is a multiple of 100
-   public boolean checkIsMultiple(int input, Screen screen){
+   public boolean checkIsMultiple(int input, screenWithButtons screen){
       int mod = input % 100;
       if (mod == 0) {
          return true;
       }else{
-         screen.displayWindowsMessage("Input is not a multiple of $100, aborting...");
+         // screen.displayWindowsMessage("Input is not a multiple of $100, aborting...");
          return false;   
       }
    }

@@ -14,7 +14,7 @@ public class Transfer extends Transaction {
     // private final static int CANCELED = 6;
  
     // Transfer constructor
-    public Transfer( int userAccountNumber, Screen atmScreen, 
+    public Transfer( int userAccountNumber, screenWithButtons atmScreen, 
     BankDatabase atmBankDatabase, Keypad atmKeypad){
 
         super(userAccountNumber, atmScreen, atmBankDatabase);
@@ -23,7 +23,7 @@ public class Transfer extends Transaction {
         keypad = atmKeypad;
     }
     //end Transfer constructor
-    public Transfer( Account userAccount, Screen atmScreen, 
+    public Transfer( Account userAccount, screenWithButtons atmScreen, 
     BankDatabase atmBankDatabase, Keypad atmKeypad )
     {
         super( userAccount, atmScreen, atmBankDatabase );
@@ -109,8 +109,6 @@ public class Transfer extends Transaction {
         double availableBalance = (subAccount != null)? bankDatabase.getAvailableBalance( getAccount()):
             bankDatabase.getAvailableBalance( getAccountNumber() );
  
-        // get references to screen
-        screen = getScreen();
 
         //transferCompound(availableBalance, subAccount, screen, keypad);
 

@@ -5,6 +5,7 @@
 
 import javax.swing.*;
 import java.awt.event.ActionListener;
+import java.awt.Font;
 import java.awt.event.ActionEvent;
 
 public class screenWithButtons extends JPanel {
@@ -20,6 +21,7 @@ public class screenWithButtons extends JPanel {
     public JButton Bt20;
     public JScrollPane jScrollPane1;
     public JTextArea jTextArea1;
+    private Font f;
 
     public screenWithButtons() {
         initComponents();
@@ -49,15 +51,15 @@ public class screenWithButtons extends JPanel {
 
         Bt21.setText("jButton3");
         add(Bt21);
-        Bt21.setBounds(620, 170, 81, 76);
+        Bt21.setBounds(620, 170, 170, 76);
 
         Bt01.setText("jButton1");
         add(Bt01);
-        Bt01.setBounds(620, 10, 81, 72);
+        Bt01.setBounds(620, 10, 170, 72);
 
         Bt31.setText("jButton4");
         add(Bt31);
-        Bt31.setBounds(620, 250, 81, 84);
+        Bt31.setBounds(620, 250, 170, 84);
 
         Bt00.setText("jButton5");
         add(Bt00);
@@ -69,7 +71,7 @@ public class screenWithButtons extends JPanel {
 
         Bt11.setText("jButton2");
         add(Bt11);
-        Bt11.setBounds(620, 90, 81, 76);
+        Bt11.setBounds(620, 90, 170, 76);
 
         Bt30.setText("jButton8");
         add(Bt30);
@@ -82,7 +84,7 @@ public class screenWithButtons extends JPanel {
 
     public void turnOn(boolean b) {
         jScrollPane1.setEnabled(b);
-        jTextArea1.setEnabled(b);
+        jTextArea1.setEditable(false);
         Bt21.setEnabled(b);
         Bt01.setEnabled(b);
         Bt31.setEnabled(b);
@@ -91,5 +93,15 @@ public class screenWithButtons extends JPanel {
         Bt11.setEnabled(b);
         Bt30.setEnabled(b);
         Bt20.setEnabled(b);
+    }
+
+    public void displayWelcome() {
+        f = new Font("Times new roman", Font.BOLD, 20);
+        jTextArea1.setFont(f);
+        jTextArea1.setText(
+            "\nWelcome!"+
+            "\nPlease login with the field on right."+
+            "\nEnter your user ID on top and password in the bottom."
+        );
     }
 }
