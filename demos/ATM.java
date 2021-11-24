@@ -199,6 +199,7 @@ public class ATM extends JFrame {
             TSTargetWaitingInput = false;
             TSwaitingInput = false;
             WDwaitingInput = false;
+            transferPerformed = false;
         }
         disableKeypad(b);
     }
@@ -278,6 +279,11 @@ public class ATM extends JFrame {
         screenWithButtons1.Bt01.setText("");
         screenWithButtons1.Bt11.setText("");
         screenWithButtons1.Bt21.setText("");
+        TSTargetWaitingInput = false;
+        TSwaitingInput = false;
+        WDwaitingInput = false;
+        transferPerformed = false;
+        resetAllScreenBT();
         this.init(true);
     }
 
@@ -542,11 +548,11 @@ public class ATM extends JFrame {
                 
                     screenWithButtons1.jTextArea1.setText("");
         
-                    screenWithButtons1.Bt00.setText("200");
-                    screenWithButtons1.Bt10.setText("400");
-                    screenWithButtons1.Bt20.setText("600");
-                    screenWithButtons1.Bt30.setText("800");
-                    screenWithButtons1.Bt01.setText("1000");
+                    screenWithButtons1.Bt00.setText("HKD200");
+                    screenWithButtons1.Bt10.setText("HKD400");
+                    screenWithButtons1.Bt20.setText("HKD600");
+                    screenWithButtons1.Bt30.setText("HKD800");
+                    screenWithButtons1.Bt01.setText("HKD1000");
                     screenWithButtons1.Bt11.setText("Custom amount");
                     screenWithButtons1.Bt21.setText("Back");
                     // System.out.println(btCommand);
@@ -608,6 +614,7 @@ public class ATM extends JFrame {
                     screenWithButtons1.Bt21.setActionCommand("Back");
                     TSwaitingInput = false;
                     WDwaitingInput = false;
+                    transferPerformed = false;
                     disableKeypad(false);
                     // disable dot inpu in target account number
                     inputButtonGP[10].setEnabled(false);
@@ -636,9 +643,9 @@ public class ATM extends JFrame {
             String btCommand = src.getActionCommand();
             if (btCommand!="OK" && btCommand != "Reset") {
                 inputField.setText(inputField.getText() + btCommand);
+                System.out.println(btCommand);
             }
             sbuffer = inputField.getText();
-            System.out.println(btCommand);
         }
     }
 
@@ -648,13 +655,16 @@ public class ATM extends JFrame {
             Transaction temp = null;
             sbuffer = inputField.getText();
             if (!validateData(sbuffer)) {
-                if (TSTargetWaitingInput && !TSwaitingInput && !WDwaitingInput) {
+                if (TSTargetWaitingInput && !TSwaitingInput && !WDwaitingInput && !transferPerformed) {
                     target = Integer.valueOf(sbuffer);
                     TSTargetWaitingInput = !TSTargetWaitingInput;
                     screenWithButtons1.jTextArea1.setText("\nPlease enter amount: ");
                     inputButtonGP[10].setEnabled(true);
+                    turnOnScreenBT();
+                    screenWithButtons1.Bt21.setText("Back");
+                    screenWithButtons1.Bt21.setActionCommand("Back");
                 }
-                if (TSwaitingInput && !WDwaitingInput && !TSTargetWaitingInput) {
+                if (TSwaitingInput && !WDwaitingInput && !TSTargetWaitingInput && !transferPerformed) {
                     if (swap != null) {
                         temp = new Transfer(swap, screenWithButtons1, 
                         bankDatabase, Double.valueOf(sbuffer), target);
@@ -671,6 +681,8 @@ public class ATM extends JFrame {
                         transferPerformed = true;
                         System.out.print(screenWithButtons1.jTextArea1.getText());
                     }
+                    resetAllScreenBT();
+                    turnOnScreenBT();
                 }
                 if (WDwaitingInput && !TSwaitingInput) {
                     if (swap != null) {
@@ -684,9 +696,9 @@ public class ATM extends JFrame {
                         temp.execute();
                     }
                     disableKeypad(true);
+                    resetAllScreenBT();
+                    turnOnScreenBT();
                 }
-                resetAllScreenBT();
-                turnOnScreenBT();
                 TSwaitingInput = true;
                 WDwaitingInput = false;
                 TSTargetWaitingInput = false;
@@ -694,82 +706,10 @@ public class ATM extends JFrame {
             }else{
                 init(true);
                 screenWithButtons1.jTextArea1.setText("Invalid format of input\n"
-                + "\n Aborted...");
+                + "\nAborted...");
             }
         }
     }
-
-    // private class normalKeypadOKListener implements ActionListener {
-
-    //     @Override
-    //     public void actionPerformed(ActionEvent e) {
-    //         // TODO Auto-generated method stub
-    //         Transaction temp = null;
-    //         if(validateData(sbuffer)){
-    //             if (TSTargetWaitingInput && !TSwaitingInput && !WDwaitingInput) {
-    //                 // validateData(sbuffer);
-    //                 target = Integer.valueOf(sbuffer);
-    //                 TSTargetWaitingInput = !TSTargetWaitingInput;
-    //                 screenWithButtons1.jTextArea1.setText("\nPlease enter amount: ");
-    //                 // setOtherScreenBTDisable(screenWithButtons1.Bt21, true);
-    //             }
-    //             if (TSwaitingInput && !WDwaitingInput && !TSTargetWaitingInput) {
-    //                 if (swap != null) {
-    //                     temp = new Transfer(swap, screenWithButtons1, 
-    //                     bankDatabase, Double.valueOf(sbuffer), target);
-    //                     TSwaitingInput = false;
-    //                     temp.execute();
-    //                     transferPerformed = true;
-    //                     System.out.print(screenWithButtons1.jTextArea1.getText());
-    //                 }if (swap == null) {
-    //                     temp = new Transfer(currentAccountNumber, screenWithButtons1, 
-    //                     bankDatabase, Double.valueOf(sbuffer), target);
-    //                     TSwaitingInput = false;
-    //                     temp.execute();
-    //                     transferPerformed = true;
-    //                     System.out.print(screenWithButtons1.jTextArea1.getText());
-    //                 }
-    //                 disableKeypad(true);
-    //             }
-    //             if (WDwaitingInput && !TSwaitingInput) {
-    //                 if (swap != null) {
-    //                     temp = new Withdrawal(swap, screenWithButtons1, 
-    //                     bankDatabase,cashDispenser,Integer.valueOf(sbuffer));
-    //                     temp.execute();
-    //                 }if (swap == null) {
-    //                     temp = new Withdrawal(currentAccountNumber, screenWithButtons1, 
-    //                     bankDatabase, cashDispenser, Integer.valueOf(sbuffer));
-    //                     temp.execute();
-    //                 }
-    //                 disableKeypad(true);
-    //             }
-    //             if (!TSTargetWaitingInput && !WDwaitingInput && !transferPerformed) {
-    //                 TSwaitingInput = true;
-    //                 setOtherScreenBTDisable(screenWithButtons1.Bt21, true);
-    //             }
-    //             resetAllScreenBT();
-    //             turnOnScreenBT();
-    //             WDwaitingInput = false;
-    //             TSTargetWaitingInput = false;
-    //             inputField.setText("");
-    //         }else{
-    //             if (TSwaitingInput) {
-    //                 screenWithButtons1.jTextArea1.setText(
-    //                     "\nInvalid input, please enter again."+
-    //                     "\nOr click Back to abort."
-    //                     );
-    //             }
-    //         }
-
-    //         if (!TSTargetWaitingInput && !WDwaitingInput && !transferPerformed) {
-    //             setOtherScreenBTDisable(screenWithButtons1.Bt21, true);
-    //             screenWithButtons1.Bt21.setText("Back");
-    //             screenWithButtons1.Bt21.setActionCommand("Back");
-    //             inputField.setText("");
-    //         }
-
-    //     }
-    // }
 
     private class normalKeypadResetListener implements ActionListener {
         @Override
