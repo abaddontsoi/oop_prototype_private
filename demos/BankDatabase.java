@@ -13,7 +13,7 @@ public class BankDatabase
 		accounts[ 0 ] = new SavingAccount( 12345, 54321, 1000.0, 1200.0 );
 
 		// for users having general account, (i.e. neither saving nor chequing)
-		accounts[ 1 ] = new Account( 98765, 56789, 200.0, 200.0 );
+		accounts[ 1 ] = new Account( 98765, 56789, 200, 200 );
 
 		// new accounts of checque account and saving account
 		accounts[ 2 ] = new ChequeAccount(2, 2, 500, 1000);

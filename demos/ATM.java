@@ -56,6 +56,7 @@ public class ATM extends JFrame {
     private final String SAVINGTYPE = "Saving account";
     private final String CHEQUEINGTYPE = "Cheque account";
     private final String BOTHTYPE = "Both";
+    private final String GENERALTYPE = "General account";
     private int accountNumber =0;
     private int pin=0;
 
@@ -324,6 +325,7 @@ public class ATM extends JFrame {
         // System.out.println(type);
         switch (type) {
             case SAVINGTYPE:
+            case GENERALTYPE:
             case CHEQUEINGTYPE:
                 screenWithButtons1.Bt01.setText("Check Balance");
                 screenWithButtons1.Bt01.setActionCommand(screenWithButtons1.Bt01.getText());
@@ -628,6 +630,7 @@ public class ATM extends JFrame {
                     TSTargetWaitingInput = false;
                     resetAllScreenBT();
                     turnOnScreenBT();
+                    disableKeypad(true);
                 break;
             }
         }
