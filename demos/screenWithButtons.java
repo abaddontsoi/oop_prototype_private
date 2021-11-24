@@ -102,6 +102,16 @@ public class screenWithButtons extends JPanel {
             "\nEnter your user ID on top and password in the bottom."
         );
     }
+    
+    public void displayFailedLogin() {
+        f = new Font("Times new roman", Font.BOLD, 20);
+        jTextArea1.setFont(f);
+        jTextArea1.setText(
+            "\nLogin failed "+
+            "\nPlease login again with the field on right."+
+            "\nEnter your user ID on top and password in the bottom."
+        );
+    }
 
     public String displayMoney(double amount) {
         String returnValue;

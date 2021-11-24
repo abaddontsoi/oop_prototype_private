@@ -56,99 +56,103 @@ public class Withdrawal extends Transaction
    private boolean normalWithdraw(double availableBalance, int currentAccountNumber, screenWithButtons screen
    , BankDatabase database, boolean disabled) {
 
-         // check whether the user has enough money in the account 
-         if ( amount <= availableBalance && amount > 0 )
-         {   
-            // check whether the cash dispenser has enough money
-            if ( cashDispenser.isSufficientCashAvailable( amount ) )
-            {
-               // update the account involved to reflect withdrawal
-               database.debit( getAccountNumber(), amount );
-               
-               cashDispenser.dispenseCash( amount ); // dispense cash
-               disabled = true; // cash was dispensed
+        // check whether the user has enough money in the account 
+        if ( amount <= availableBalance && amount > 0 )
+        {
+            if (checkIsMultiple(amount, screen)) {
+                // check whether the cash dispenser has enough money
+                if ( cashDispenser.isSufficientCashAvailable( amount ) )
+                {
+                // update the account involved to reflect withdrawal
+                database.debit( getAccountNumber(), amount );
+                
+                cashDispenser.dispenseCash( amount ); // dispense cash
+                disabled = true; // cash was dispensed
 
-               // instruct user to take cash
-               screen.jTextArea1.setText(
-                  "\nRequest successful." + 
-                  "\nCash will be dispensed after log out."+
-                  "\nPlease remeber to take them." +
-                  "\n\nReady for other opperation."
-                  );
-            } 
-            else{
-               screen.jTextArea1.setText(
-                  "\nInsufficient cash available in the ATM." +
-                  "\n\nPlease choose a smaller amount."+
-                  "\n\nAborted."
-               );
-            }
-         } 
-         else // not enough money available in user's account
-         {
+                // instruct user to take cash
+                screen.jTextArea1.setText(
+                    "\nRequest successful." + 
+                    "\nCash will be dispensed after log out."+
+                    "\nPlease remeber to take them." +
+                    "\n\nReady for other opperation."
+                    );
+                } 
+                else{
+                screen.jTextArea1.setText(
+                    "\nInsufficient cash available in the ATM." +
+                    "\n\nPlease choose a smaller amount."+
+                    "\n\nAborted."
+                );
+                }
+            }   
+        } 
+        else // not enough money available in user's account
+        {
             screen.jTextArea1.setText(
-               "\nInsufficient funds in your account." +
-               "\n\nPlease choose a smaller amount." +
-               "\n\nAborted."
-               );
-         } // end else
-
-         // check whether user chose a withdrawal amount or canceled
-         return disabled;
-   }
-
-   private boolean compoundWithdraw(double availableBalance, Account subAccount, screenWithButtons screen,  
-      BankDatabase database, boolean disabled) {
-
-      // check whether the user has enough money in the account 
-      if ( amount <= availableBalance && amount > 0)
-      {   
-         // check whether the cash dispenser has enough money
-         if ( cashDispenser.isSufficientCashAvailable( amount ) )
-         {
-            // update the account involved to reflect withdrawal
-            database.debit( subAccount, amount );
-            
-            cashDispenser.dispenseCash( amount ); // dispense cash
-            disabled = true; // cash was dispensed
-
-            // instruct user to take the card and cash
-            screen.jTextArea1.setText(
-               "\nRequest successful." + 
-               "\nCash will be dispensed after log out."+
-               "\nPlease remeber to take them."+
-               "\n\nReady for other opperation."
-            );
-         } 
-         else{
-            screen.jTextArea1.setText(
-               "\nInsufficient cash available in the ATM." +
-               "\n\nPlease choose a smaller amount." +
-               "\n\nAborted."
-               );   
-         }
-      } 
-      else 
-      {
-         screen.jTextArea1.setText(
             "\nInsufficient funds in your account." +
             "\n\nPlease choose a smaller amount." +
             "\n\nAborted."
             );
-      } 
-      return disabled;
-   }
+        } // end else
 
-   // to check whether user's input is a multiple of 100
-   public boolean checkIsMultiple(int input, screenWithButtons screen){
-      int mod = input % 100;
-      if (mod == 0) {
-         return true;
-      }else{
-         screen.jTextArea1.setText("Your input is NOT a multiple of 100");
-         return false;   
-      }
-   }
+        // check whether user chose a withdrawal amount or canceled
+        return disabled;
+    }
+
+    private boolean compoundWithdraw(double availableBalance, Account subAccount, screenWithButtons screen,  
+        BankDatabase database, boolean disabled) {
+
+        // check whether the user has enough money in the account 
+        if ( amount <= availableBalance && amount > 0)
+        {
+            if (checkIsMultiple(amount, screen)) {
+                // check whether the cash dispenser has enough money
+                if ( cashDispenser.isSufficientCashAvailable( amount ) )
+                {
+                    // update the account involved to reflect withdrawal
+                    database.debit( subAccount, amount );
+                    
+                    cashDispenser.dispenseCash( amount ); // dispense cash
+                    disabled = true; // cash was dispensed
+
+                    // instruct user to take the card and cash
+                    screen.jTextArea1.setText(
+                    "\nRequest successful." + 
+                    "\nCash will be dispensed after log out."+
+                    "\nPlease remeber to take them."+
+                    "\n\nReady for other opperation."
+                    );
+                } 
+                else{
+                    screen.jTextArea1.setText(
+                    "\nInsufficient cash available in the ATM." +
+                    "\n\nPlease choose a smaller amount." +
+                    "\n\nAborted."
+                    );   
+                }
+            }   
+        } 
+        else 
+        {
+            screen.jTextArea1.setText(
+                "\nInsufficient funds in your account." +
+                "\n\nPlease choose a smaller amount." +
+                "\n\nAborted."
+                );
+        } 
+        return disabled;
+    }
+
+    // to check whether user's input is a multiple of 100
+    public boolean checkIsMultiple(int input, screenWithButtons screen){
+        int mod = input % 100;
+        if (mod == 0) {
+            return true;
+        }else{
+            screen.jTextArea1.setText("Your input is NOT a multiple of 100");
+            return false;   
+        }
+    }
 } // end class Withdrawal
 
 
