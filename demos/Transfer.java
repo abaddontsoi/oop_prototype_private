@@ -70,7 +70,7 @@ public class Transfer extends Transaction {
             screen.jTextArea1.setText("Successful");
         }else{
             screen.jTextArea1.setText(
-                "\nAvailavle balance is lower than transfer amount or target account unavailable."+
+                "\nAvailavle balance is lower than transfer amount \nor target account unavailable."+
                 "\nProgress aborted."
             );     
         }

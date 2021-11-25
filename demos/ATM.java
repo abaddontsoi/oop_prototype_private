@@ -671,7 +671,9 @@ public class ATM extends JFrame {
                         TSwaitingInput = false;
                         temp.execute();
                         transferPerformed = true;
+                        System.out.println(transferPerformed);
                         System.out.print(screenWithButtons1.jTextArea1.getText());
+                        disableKeypad(true);
                     }
                     if (swap == null) {
                         temp = new Transfer(currentAccountNumber, screenWithButtons1, 
@@ -680,6 +682,7 @@ public class ATM extends JFrame {
                         temp.execute();
                         transferPerformed = true;
                         System.out.print(screenWithButtons1.jTextArea1.getText());
+                        disableKeypad(true);
                     }
                     resetAllScreenBT();
                     turnOnScreenBT();
