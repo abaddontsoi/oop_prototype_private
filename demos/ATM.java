@@ -69,7 +69,7 @@ public class ATM extends JFrame {
     private boolean TSTargetWaitingInput = false;
     public String sbuffer = "";
     public int target;
-    public boolean transferPerformed = false;
+    private boolean transferPerformed = false;
 
     public ATM() {
         initComponents();
@@ -643,6 +643,9 @@ public class ATM extends JFrame {
                 System.out.println(btCommand);
             }
             sbuffer = inputField.getText();
+            if (btCommand == ".") {
+                inputButtonGP[10].setEnabled(false);
+            }
         }
     }
 
@@ -702,6 +705,7 @@ public class ATM extends JFrame {
                 inputField.setText("");
             }else{
                 init(true);
+                turnOnScreenBT();
                 screenWithButtons1.jTextArea1.setText("Invalid format of input\n"
                 + "\nAborted...");
             }
