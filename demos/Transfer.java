@@ -53,6 +53,9 @@ public class Transfer extends Transaction {
                 "\nProgress aborted."
             ); 
         }
+        System.out.println(availableBalance);
+        System.out.println(accountNumber);
+        System.out.println(target);
     }
  
     private void transferCompound(double availableBalance, Account subAccount, int target){

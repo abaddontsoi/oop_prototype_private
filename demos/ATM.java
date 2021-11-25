@@ -30,7 +30,7 @@ public class ATM extends JFrame {
     private LoginAndOut loginAndOut2;
     private screenWithButtons screenWithButtons1;
 
-    private boolean userAuthenticated =false; // whether user is authenticated
+    private boolean userAuthenticated = false; // whether user is authenticated
     private int currentAccountNumber; // current user's account number
     private CashDispenser cashDispenser = new CashDispenser(); // ATM's cash dispenser
     private BankDatabase bankDatabase = new BankDatabase(); // account information database
@@ -170,12 +170,6 @@ public class ATM extends JFrame {
         }
 
         pack();
-    }
-    public static void main(String args[]) {
-        ATM atm = new ATM();
-        atm.init(true);
-        atm.setVisible(true);
-        atm.setSize(1400, 500);
     }
 
     public void init(boolean b) {
